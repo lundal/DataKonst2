@@ -4,7 +4,7 @@
 -- Created:  2013-10-29
 -- 
 -- Description: 
--- Implementation of a pipelined processor using a subset of MIPS instruction set.
+-- A pipelined processor using a subset of the MIPS instruction set.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -15,19 +15,21 @@ use WORK.MIPS_CONSTANT_PKG.ALL;
 
 entity processor is
     generic(
-        MEM_ADDR_BUS : integer := 32;
-        MEM_DATA_BUS : integer := 32
+        PC_SIZE   : integer := IADDR_BUS;
+        INST_SIZE : integer := IDATA_BUS;
+        REG_SIZE      : integer := DDATA_BUS;
+        REG_ADDR_SIZE : integer := RADDR_BUS
     );
     port( 
         clk               : in  STD_LOGIC;
         reset             : in  STD_LOGIC;
         processor_enable  : in  STD_LOGIC;
-        imem_address      : out STD_LOGIC_VECTOR(MEM_ADDR_BUS-1 downto 0);
-        imem_data_in      : in  STD_LOGIC_VECTOR(MEM_DATA_BUS-1 downto 0);
-        dmem_data_in      : in  STD_LOGIC_VECTOR(MEM_DATA_BUS-1 downto 0);
-        dmem_address      : out STD_LOGIC_VECTOR(MEM_ADDR_BUS-1 downto 0);
-        dmem_address_wr   : out STD_LOGIC_VECTOR(MEM_ADDR_BUS-1 downto 0);
-        dmem_data_out     : out STD_LOGIC_VECTOR(MEM_DATA_BUS-1 downto 0);
+        imem_address      : out STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+        imem_data_in      : in  STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
+        dmem_data_in      : in  STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+        dmem_address      : out STD_LOGIC_VECTOR(PC_SIZE-1 downto 0); --TODO
+        dmem_address_wr   : out STD_LOGIC_VECTOR(PC_SIZE-1 downto 0); --TODO
+        dmem_data_out     : out STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
         dmem_write_enable : out STD_LOGIC
     );
 end processor;
@@ -205,6 +207,81 @@ architecture Behavioral of processor is
             R    : out STD_LOGIC_VECTOR(N-1 downto 0)
         );
     end component;
+    
+    -- IF signals
+    signal if_pc   : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    signal if_pc_1 : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    
+    -- ID control signals
+    signal idc_reg_dst    : in  STD_LOGIC;
+    signal idc_alu_op     : in  ALU_OP;
+    signal idc_alu_src    : in  STD_LOGIC;
+    signal idc_branch     : in  STD_LOGIC;
+    signal idc_mem_read   : in  STD_LOGIC;
+    signal idc_mem_write  : in  STD_LOGIC;
+    signal idc_reg_write  : in  STD_LOGIC;
+    signal idc_mem_to_reg : in  STD_lOGIC;
+    
+    -- ID signals
+    signal id_pc     : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    signal id_inst   : STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
+    signal id_opcode : STD_LOGIC_VECTOR(6-1 downto 0);
+    signal id_func   : STD_LOGIC_VECTOR(6-1 downto 0);
+    signal id_rs     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal id_rt     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal id_rsa    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+    signal id_rta    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+    signal id_rda    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+    signal id_imm    : STD_LOGIC_VECTOR(16-1 downto 0);
+    signal id_imm_x  : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    
+    -- EX control signals
+    signal idc_reg_dst    : in  STD_LOGIC;
+    signal idc_alu_op     : in  ALU_OP;
+    signal idc_alu_src    : in  STD_LOGIC;
+    signal idc_branch     : in  STD_LOGIC;
+    signal idc_mem_read   : in  STD_LOGIC;
+    signal idc_mem_write  : in  STD_LOGIC;
+    signal idc_reg_write  : in  STD_LOGIC;
+    signal idc_mem_to_reg : in  STD_lOGIC;
+    
+    -- EX signals
+    signal ex_pc     : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    signal ex_target : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    signal ex_rs     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal ex_rt     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal ex_imm_x  : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal ex_rta    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+    signal ex_rda    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+    signal ex_wba    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+    signal ex_res    : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal ex_zero   : STD_LOGIC;
+    
+    -- MEM control signals
+    signal idc_branch     : in  STD_LOGIC;
+    signal idc_mem_read   : in  STD_LOGIC;
+    signal idc_mem_write  : in  STD_LOGIC;
+    signal idc_reg_write  : in  STD_LOGIC;
+    signal idc_mem_to_reg : in  STD_lOGIC;
+    
+    -- MEM signals
+    signal mem_target : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    signal mem_mem    : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal mem_rt     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal mem_wba    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+    signal mem_res    : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal mem_zero   : STD_LOGIC;
+    
+    -- WB control signals
+    signal idc_reg_write  : in  STD_LOGIC;
+    signal idc_mem_to_reg : in  STD_lOGIC;
+    
+    -- WB signals
+    signal wb_mem : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal wb_res : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal wb_wba : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+    signal wb_wb  : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    
 begin
 
 end Behavioral;
