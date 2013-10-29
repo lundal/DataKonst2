@@ -187,7 +187,7 @@ architecture Behavioral of processor is
     end component;
     
     component alu is
-        generic (N: NATURAL := DDATA_BUS);
+        generic (N: natural);
         port(
             X      : in  STD_LOGIC_VECTOR(N-1 downto 0);
             Y      : in  STD_LOGIC_VECTOR(N-1 downto 0);
@@ -198,7 +198,7 @@ architecture Behavioral of processor is
     end component;
     
     component adder is
-        generic (N: natural := MEM_DATA_BUS);    
+        generic (N: natural);    
         port(
             X    : in  STD_LOGIC_VECTOR(N-1 downto 0);
             Y    : in  STD_LOGIC_VECTOR(N-1 downto 0);
@@ -213,14 +213,14 @@ architecture Behavioral of processor is
     signal if_pc_1 : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
     
     -- ID control signals
-    signal idc_reg_dst    : in  STD_LOGIC;
-    signal idc_alu_op     : in  ALU_OP;
-    signal idc_alu_src    : in  STD_LOGIC;
-    signal idc_branch     : in  STD_LOGIC;
-    signal idc_mem_read   : in  STD_LOGIC;
-    signal idc_mem_write  : in  STD_LOGIC;
-    signal idc_reg_write  : in  STD_LOGIC;
-    signal idc_mem_to_reg : in  STD_lOGIC;
+    signal idc_reg_dst    : STD_LOGIC;
+    signal idc_alu_op     : ALU_OP;
+    signal idc_alu_src    : STD_LOGIC;
+    signal idc_branch     : STD_LOGIC;
+    signal idc_mem_read   : STD_LOGIC;
+    signal idc_mem_write  : STD_LOGIC;
+    signal idc_reg_write  : STD_LOGIC;
+    signal idc_mem_to_reg : STD_lOGIC;
     
     -- ID signals
     signal id_pc     : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
@@ -236,14 +236,14 @@ architecture Behavioral of processor is
     signal id_imm_x  : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
     
     -- EX control signals
-    signal idc_reg_dst    : in  STD_LOGIC;
-    signal idc_alu_op     : in  ALU_OP;
-    signal idc_alu_src    : in  STD_LOGIC;
-    signal idc_branch     : in  STD_LOGIC;
-    signal idc_mem_read   : in  STD_LOGIC;
-    signal idc_mem_write  : in  STD_LOGIC;
-    signal idc_reg_write  : in  STD_LOGIC;
-    signal idc_mem_to_reg : in  STD_lOGIC;
+    signal exc_reg_dst    : STD_LOGIC;
+    signal exc_alu_op     : ALU_OP;
+    signal exc_alu_src    : STD_LOGIC;
+    signal exc_branch     : STD_LOGIC;
+    signal exc_mem_read   : STD_LOGIC;
+    signal exc_mem_write  : STD_LOGIC;
+    signal exc_reg_write  : STD_LOGIC;
+    signal exc_mem_to_reg : STD_lOGIC;
     
     -- EX signals
     signal ex_pc     : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
@@ -258,11 +258,11 @@ architecture Behavioral of processor is
     signal ex_zero   : STD_LOGIC;
     
     -- MEM control signals
-    signal idc_branch     : in  STD_LOGIC;
-    signal idc_mem_read   : in  STD_LOGIC;
-    signal idc_mem_write  : in  STD_LOGIC;
-    signal idc_reg_write  : in  STD_LOGIC;
-    signal idc_mem_to_reg : in  STD_lOGIC;
+    signal memc_branch     : STD_LOGIC;
+    signal memc_mem_read   : STD_LOGIC;
+    signal memc_mem_write  : STD_LOGIC;
+    signal memc_reg_write  : STD_LOGIC;
+    signal memc_mem_to_reg : STD_lOGIC;
     
     -- MEM signals
     signal mem_target : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
@@ -273,8 +273,8 @@ architecture Behavioral of processor is
     signal mem_zero   : STD_LOGIC;
     
     -- WB control signals
-    signal idc_reg_write  : in  STD_LOGIC;
-    signal idc_mem_to_reg : in  STD_lOGIC;
+    signal wbc_reg_write  : STD_LOGIC;
+    signal wbc_mem_to_reg : STD_lOGIC;
     
     -- WB signals
     signal wb_mem : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
