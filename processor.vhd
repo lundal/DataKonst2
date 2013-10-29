@@ -481,6 +481,27 @@ begin
         id_imm    <= id_inst(15 downto 0);
     end process;
     
+    ID_CTRL_UNIT : control_unit
+    port map(
+        -- Input
+        opcode => id_opcode,
+        func   => id_func,
+        
+        -- EX control signals
+        reg_dst => idc_reg_dst,
+        alu_op  => idc_alu_op,
+        alu_src => idc_alu_src,
+        
+        -- MEM control signals
+        branch    => idc_branch,
+        mem_read  => idc_mem_read,
+        mem_write => idc_mem_write,
+        
+        -- WB Control signals
+        reg_write  => idc_reg_write,
+        mem_to_reg => idc_mem_to_reg
+    );
+
     ID_REGS : register_file
     port map(
         CLK        => clk,
@@ -516,28 +537,6 @@ begin
         R   => ex_target,
         CIN => '0'
     );
-    
-    CTRL_UNIT : control_unit
-    port map(
-        -- Input
-        opcode => id_opcode,
-        func   => id_func,
-        
-        -- EX control signals
-        reg_dst => idc_reg_dst,
-        alu_op  => idc_alu_op,
-        alu_src => idc_alu_src,
-        
-        -- MEM control signals
-        branch    => idc_branch,
-        mem_read  => idc_mem_read,
-        mem_write => idc_mem_write,
-        
-        -- WB Control signals
-        reg_write  => idc_reg_write,
-        mem_to_reg => idc_mem_to_reg
-    );
-
     
     -- Instruction Memory
     imem_address <= if_pc;
