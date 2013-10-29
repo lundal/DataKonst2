@@ -8,7 +8,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
+--use IEEE.STD_LOGIC_ARITH.ALL;
 
 library WORK;
 use WORK.MIPS_CONSTANT_PKG.ALL;
@@ -35,6 +35,7 @@ entity processor is
 end processor;
 
 architecture Behavioral of processor is
+    
     component if_id is
         generic(
             PC_SIZE   : integer := IADDR_BUS;
@@ -211,6 +212,7 @@ architecture Behavioral of processor is
     -- IF signals
     signal if_pc   : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
     signal if_pc_1 : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    signal if_inst : STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
     
     -- ID control signals
     signal idc_reg_dst    : STD_LOGIC;
@@ -229,7 +231,6 @@ architecture Behavioral of processor is
     signal id_func   : STD_LOGIC_VECTOR(6-1 downto 0);
     signal id_rs     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
     signal id_rt     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
-    signal id_rsa    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal id_rta    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal id_rda    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal id_imm    : STD_LOGIC_VECTOR(16-1 downto 0);
@@ -282,6 +283,142 @@ architecture Behavioral of processor is
     signal wb_wba : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal wb_wb  : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
     
+    -- Other signals
+    signal pipeline_enable : STD_LOGIC;
+    
 begin
-
+    
+    REG_IF_ID : if_id
+    generic map(
+        PC_SIZE   => PC_SIZE,
+        INST_SIZE => INST_SIZE
+    )
+    port map(
+        -- Signals
+        pc_in    => if_pc_1,
+        pc_out   => id_pc,
+        inst_in  => if_inst,
+        inst_out => id_inst,
+        
+        -- Pipeline signals
+        clk    => clk,
+        reset  => reset,
+        enable => pipeline_enable
+    );
+    
+    REG_ID_EX : id_ex
+    generic map(
+        PC_SIZE       => PC_SIZE,
+        REG_SIZE      => REG_SIZE,
+        REG_ADDR_SIZE => REG_ADDR_SIZE
+    )
+    port map(
+        -- EX control signals
+        reg_dst_in  => idc_reg_dst,
+        reg_dst_out => exc_reg_dst,
+        alu_op_in   => idc_alu_op,
+        alu_op_out  => exc_alu_op,
+        alu_src_in  => idc_alu_src,
+        alu_src_out => exc_alu_src,
+        
+        -- MEM control signals
+        branch_in     => idc_branch,
+        branch_out    => exc_branch,
+        mem_read_in   => idc_mem_read,
+        mem_read_out  => exc_mem_read,
+        mem_write_in  => idc_mem_write,
+        mem_write_out => exc_mem_write,
+        
+        -- WB Control signals
+        reg_write_in   => idc_reg_write,
+        reg_write_out  => exc_reg_write,
+        mem_to_reg_in  => idc_mem_to_reg,
+        mem_to_reg_out => exc_mem_to_reg,
+        
+        -- Signals
+        pc_in   => id_pc,
+        pc_out  => ex_pc,
+        rs_in   => id_rs,
+        rs_out  => ex_rs,
+        rt_in   => id_rt,
+        rt_out  => ex_rt,
+        imm_in  => id_imm_x,
+        imm_out => ex_imm_x,
+        rta_in  => id_rta,
+        rta_out => ex_rta,
+        rda_in  => id_rda,
+        rda_out => ex_rda,
+        
+        -- Pipeline signals
+        clk    => clk,
+        reset  => reset,
+        enable => pipeline_enable
+    );
+    
+    REG_EX_MEM : ex_mem
+    generic map(
+        PC_SIZE       => PC_SIZE,
+        REG_SIZE      => REG_SIZE,
+        REG_ADDR_SIZE => REG_ADDR_SIZE
+    )
+    port map(
+        -- MEM control signals
+        branch_in     => exc_branch,
+        branch_out    => memc_branch,
+        mem_read_in   => exc_mem_read,
+        mem_read_out  => memc_mem_read,
+        mem_write_in  => exc_mem_write,
+        mem_write_out => memc_mem_write,
+        
+        -- WB Control signals
+        reg_write_in   => exc_reg_write,
+        reg_write_out  => memc_reg_write,
+        mem_to_reg_in  => exc_mem_to_reg,
+        mem_to_reg_out => memc_mem_to_reg,
+        
+        -- Signals
+        zero_in  => ex_zero,
+        zero_out => mem_zero,
+        pc_in    => ex_target,
+        pc_out   => mem_target,
+        res_in   => ex_res,
+        res_out  => mem_res,
+        rt_in    => ex_rt,
+        rt_out   => mem_rt,
+        wba_in   => ex_wba,
+        wba_out  => mem_wba,
+        
+        -- Pipeline signals
+        clk    => clk,
+        reset  => reset,
+        enable => pipeline_enable
+    );
+    
+    REG_MEM_WB : mem_wb
+    generic map(
+        PC_SIZE       => PC_SIZE,
+        REG_SIZE      => REG_SIZE,
+        REG_ADDR_SIZE => REG_ADDR_SIZE
+    )
+    port map(
+        -- WB Control signals
+        reg_write_in   => memc_reg_write,
+        reg_write_out  => wbc_reg_write,
+        mem_to_reg_in  => memc_mem_to_reg,
+        mem_to_reg_out => wbc_mem_to_reg,
+        
+        -- Signals
+        mem_in  => mem_mem,
+        mem_out => wb_mem,
+        res_in  => mem_res,
+        res_out => wb_res,
+        wba_in  => mem_wba,
+        wba_out => wb_wba,
+        
+        -- Pipeline signals
+        clk    => clk,
+        reset  => reset,
+        enable => pipeline_enable
+    );
+    
 end Behavioral;
