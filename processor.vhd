@@ -210,9 +210,10 @@ architecture Behavioral of processor is
     end component;
     
     -- IF signals
-    signal if_pc   : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
-    signal if_pc_1 : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
-    signal if_inst : STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
+    signal if_pc      : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    signal if_pc_1    : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    signal if_pc_next : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+    signal if_inst    : STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
     
     -- ID control signals
     signal idc_reg_dst    : STD_LOGIC;
@@ -253,10 +254,12 @@ architecture Behavioral of processor is
     signal ex_rs     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
     signal ex_rt     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
     signal ex_imm_x  : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal ex_alu_y  : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
     signal ex_rta    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal ex_rda    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal ex_wba    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal ex_res    : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal ex_alu_in : ALU_INPUT;
     signal ex_flags  : ALU_FLAGS;
     signal ex_zero   : STD_LOGIC;
     
@@ -274,6 +277,7 @@ architecture Behavioral of processor is
     signal mem_wba    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal mem_res    : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
     signal mem_zero   : STD_LOGIC;
+    signal mem_pc_src : STD_LOGIC;
     
     -- WB control signals
     signal wbc_reg_write  : STD_LOGIC;
@@ -442,12 +446,25 @@ begin
     )
     port map(
         X      => ex_rs,
-        Y      => ex_rt, -- TODO
-        -- TODO : ALU_IN => exc_alu_op(1 downto 0),
+        Y      => ex_alu_y,
+        ALU_IN => ex_alu_in,
         R      => ex_res,
         FLAGS  => ex_flags
     );
     
+    -- PC source
+    mem_pc_src <= memc_branch and mem_zero;
     
+    -- MUX: PC Source
+    if_pc_next <= if_pc_1 when mem_pc_src = '0' else mem_target;
+    
+    -- MUX: Destination Register
+    ex_wba <= ex_rta when exc_reg_dst = '0' else ex_rda;
+    
+    -- MUX: ALU Source
+    ex_alu_y <= ex_rt when exc_alu_src = '0' else ex_imm_x;
+
+    -- MUX: Memory To Registry
+    wb_wb <= wb_res when wbc_mem_to_reg = '0' else wb_mem;
     
 end Behavioral;
