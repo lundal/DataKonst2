@@ -427,6 +427,17 @@ begin
         enable => pipeline_enable
     );
     
+	REG_PC : process(clk, reset, pipeline_enable, if_pc_next)
+	begin
+	    if rising_edge(clk) and pipeline_enable = '1' then
+		    if reset = '1' then
+				if_pc <= (others => '0');
+			else
+				if_pc <= if_pc_next;
+			end if;
+		end if;
+	end process;
+	
     IF_PC_INC : adder
     generic map(
         N => PC_SIZE
