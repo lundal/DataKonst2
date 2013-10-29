@@ -231,6 +231,7 @@ architecture Behavioral of processor is
     signal id_func   : STD_LOGIC_VECTOR(6-1 downto 0);
     signal id_rs     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
     signal id_rt     : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal id_rsa    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal id_rta    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal id_rda    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal id_imm    : STD_LOGIC_VECTOR(16-1 downto 0);
@@ -256,6 +257,7 @@ architecture Behavioral of processor is
     signal ex_rda    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal ex_wba    : STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
     signal ex_res    : STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+    signal ex_flags  : ALU_FLAGS;
     signal ex_zero   : STD_LOGIC;
     
     -- MEM control signals
@@ -420,5 +422,32 @@ begin
         reset  => reset,
         enable => pipeline_enable
     );
+    
+    ID_REGS : register_file
+    port map(
+        CLK        => clk,
+        RESET      => reset,
+        RW         => wbc_reg_write,
+        RS_ADDR    => id_rsa,
+        RT_ADDR    => id_rta,
+        RD_ADDR    => wb_wba,
+        WRITE_DATA => wb_wb,
+        RS         => id_rs,
+        RT         => id_rt
+    );
+    
+    EX_ALU : alu
+    generic map(
+        N => REG_SIZE
+    )
+    port map(
+        X      => ex_rs,
+        Y      => ex_rt, -- TODO
+        -- TODO : ALU_IN => exc_alu_op(1 downto 0),
+        R      => ex_res,
+        FLAGS  => ex_flags
+    );
+    
+    
     
 end Behavioral;
