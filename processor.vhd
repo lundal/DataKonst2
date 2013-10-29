@@ -474,6 +474,17 @@ begin
         CIN => '0'
     );
     
+    -- Instruction Memory
+    imem_address <= if_pc;
+    if_inst <= imem_data_in;
+    
+    -- Data Memory
+    dmem_address <= mem_res;
+    dmem_address_wr <= mem_res;
+    dmem_data_out <= mem_rt;
+    dmem_write_enable <= memc_mem_write;
+    mem_mem <= dmem_data_in;
+    
     -- Sign Extender
     id_imm_x <= ZERO16b & id_imm when id_imm(16-1) = '0' else ONE16b & id_imm;
     
