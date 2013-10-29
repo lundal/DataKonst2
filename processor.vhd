@@ -471,6 +471,16 @@ begin
         CIN => '1'
     );
     
+    ID_DECODER : process(id_inst)
+    begin
+        id_opcode <= id_inst(31 downto 26);
+        id_func   <= id_inst(5 downto 0);
+        id_rsa    <= id_inst(25 downto 21);
+        id_rta    <= id_inst(20 downto 16);
+        id_rda    <= id_inst(15 downto 11);
+        id_imm    <= id_inst(15 downto 0);
+    end process;
+    
     ID_REGS : register_file
     port map(
         CLK        => clk,
@@ -527,6 +537,7 @@ begin
         reg_write  => idc_reg_write,
         mem_to_reg => idc_mem_to_reg
     );
+
     
     -- Instruction Memory
     imem_address <= if_pc;
