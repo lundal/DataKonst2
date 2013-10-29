@@ -1,21 +1,10 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Engineer: Zirgon
+-- Project:  DataKonst2
+-- Created:  2013-10-29
 -- 
--- Create Date:    11:09:23 09/20/2013 
--- Design Name: 
--- Module Name:    processor - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
 -- Description: 
---
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
+-- Implementation of a pipelined processor using a subset of MIPS instruction set.
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -44,6 +33,143 @@ entity processor is
 end processor;
 
 architecture Behavioral of processor is
+    component if_id is
+        generic(
+            PC_SIZE   : integer := IADDR_BUS;
+            INST_SIZE : integer := IDATA_BUS
+        );
+        port( 
+            -- Signals
+            pc_in    : in  STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+            pc_out   : out STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+            inst_in  : in  STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
+            inst_out : out STD_LOGIC_VECTOR(INST_SIZE-1 downto 0);
+            
+            -- Pipeline signals
+            clk      : in  STD_LOGIC;
+            reset    : in  STD_LOGIC;
+            enable   : in  STD_LOGIC
+        );
+    end component;
+
+    component id_ex is
+        generic(
+            PC_SIZE       : integer := IADDR_BUS;
+            REG_SIZE      : integer := DDATA_BUS;
+            REG_ADDR_SIZE : integer := RADDR_BUS
+        );
+        port( 
+            -- EX control signals
+            reg_dst_in  : in  STD_LOGIC;
+            reg_dst_out : out STD_LOGIC;
+            alu_op_in   : in  ALU_OP;
+            alu_op_out  : out ALU_OP;
+            alu_src_in  : in  STD_LOGIC;
+            alu_src_out : out STD_LOGIC;
+            
+            -- MEM control signals
+            branch_in     : in  STD_LOGIC;
+            branch_out    : out STD_LOGIC;
+            mem_read_in   : in  STD_LOGIC;
+            mem_read_out  : out STD_LOGIC;
+            mem_write_in  : in  STD_LOGIC;
+            mem_write_out : out STD_LOGIC;
+            
+            -- WB Control signals
+            reg_write_in   : in  STD_LOGIC;
+            reg_write_out  : out STD_LOGIC;
+            mem_to_reg_in  : in  STD_lOGIC;
+            mem_to_reg_out : out STD_lOGIC;
+            
+            -- Signals
+            pc_in   : in  STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+            pc_out  : out STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+            rs_in   : in  STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            rs_out  : out STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            rt_in   : in  STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            rt_out  : out STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            imm_in  : in  STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            imm_out : out STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            rta_in  : in  STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+            rta_out : out STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+            rda_in  : in  STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+            rda_out : out STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+            
+            -- Pipeline signals
+            clk    : in  STD_LOGIC;
+            reset  : in  STD_LOGIC;
+            enable : in  STD_LOGIC
+        );
+    end component;
+    
+    component ex_mem is
+        generic(
+            PC_SIZE       : integer := IADDR_BUS;
+            REG_SIZE      : integer := DDATA_BUS;
+            REG_ADDR_SIZE : integer := RADDR_BUS
+        );
+        port( 
+            -- MEM control signals
+            branch_in     : in  STD_LOGIC;
+            branch_out    : out STD_LOGIC;
+            mem_read_in   : in  STD_LOGIC;
+            mem_read_out  : out STD_LOGIC;
+            mem_write_in  : in  STD_LOGIC;
+            mem_write_out : out STD_LOGIC;
+            
+            -- WB Control signals
+            reg_write_in   : in  STD_LOGIC;
+            reg_write_out  : out STD_LOGIC;
+            mem_to_reg_in  : in  STD_lOGIC;
+            mem_to_reg_out : out STD_lOGIC;
+            
+            -- Signals
+            zero_in  : in  STD_LOGIC;
+            zero_out : out STD_LOGIC;
+            pc_in    : in  STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+            pc_out   : out STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+            res_in   : in  STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            res_out  : out STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            rt_in    : in  STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            rt_out   : out STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            wba_in   : in  STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+            wba_out  : out STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+            
+            -- Pipeline signals
+            clk    : in  STD_LOGIC;
+            reset  : in  STD_LOGIC;
+            enable : in  STD_LOGIC
+        );
+    end component;
+    
+    component mem_wb is
+        generic(
+            PC_SIZE       : integer := IADDR_BUS;
+            REG_SIZE      : integer := DDATA_BUS;
+            REG_ADDR_SIZE : integer := RADDR_BUS
+        );
+        port( 
+            -- WB Control signals
+            reg_write_in   : in  STD_LOGIC;
+            reg_write_out  : out STD_LOGIC;
+            mem_to_reg_in  : in  STD_lOGIC;
+            mem_to_reg_out : out STD_lOGIC;
+            
+            -- Signals
+            mem_in  : in  STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+            mem_out : out STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
+            res_in  : in  STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            res_out : out STD_LOGIC_VECTOR(REG_SIZE-1 downto 0);
+            wba_in  : in  STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+            wba_out : out STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+            
+            -- Pipeline signals
+            clk    : in  STD_LOGIC;
+            reset  : in  STD_LOGIC;
+            enable : in  STD_LOGIC
+        );
+    end component;
+    
     component register_file is
         port(
             CLK        : in  STD_LOGIC;
