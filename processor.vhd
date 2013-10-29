@@ -427,6 +427,17 @@ begin
         enable => pipeline_enable
     );
     
+    IF_PC_INC : adder
+    generic map(
+        N => PC_SIZE
+    )
+    port map(
+        X   => if_pc,
+        Y   => (others => '0'),
+        R   => if_pc_1,
+        CIN => '1'
+    );
+    
     ID_REGS : register_file
     port map(
         CLK        => clk,
@@ -451,6 +462,20 @@ begin
         R      => ex_res,
         FLAGS  => ex_flags
     );
+    
+    EX_BRANCH_TARGET : adder
+    generic map(
+        N => REG_SIZE
+    )
+    port map(
+        X   => ex_pc,
+        Y   => ex_imm_x,
+        R   => ex_target,
+        CIN => '0'
+    );
+    
+    -- Sign Extender
+    id_imm_x <= ZERO16b & id_imm when id_imm(16-1) = '0' else ONE16b & id_imm;
     
     -- PC source
     mem_pc_src <= memc_branch and mem_zero;
