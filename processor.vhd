@@ -209,6 +209,28 @@ architecture Behavioral of processor is
         );
     end component;
     
+    component control_unit is
+        port(
+            -- Input
+            opcode : in STD_LOGIC_VECTOR(6-1 downto 0);
+            func   : in STD_LOGIC_VECTOR(6-1 downto 0);
+            
+            -- EX control signals
+            reg_dst : out STD_LOGIC;
+            alu_op  : out ALU_OP;
+            alu_src : out STD_LOGIC;
+            
+            -- MEM control signals
+            branch    : out STD_LOGIC;
+            mem_read  : out STD_LOGIC;
+            mem_write : out STD_LOGIC;
+            
+            -- WB Control signals
+            reg_write  : out STD_LOGIC;
+            mem_to_reg : out STD_lOGIC
+        );
+    end component;
+    
     -- IF signals
     signal if_pc      : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
     signal if_pc_1    : STD_LOGIC_VECTOR(PC_SIZE-1 downto 0);
@@ -483,6 +505,27 @@ begin
         Y   => ex_imm_x,
         R   => ex_target,
         CIN => '0'
+    );
+    
+    CTRL_UNIT : control_unit
+    port map(
+        -- Input
+        opcode => id_opcode,
+        func   => id_func,
+        
+        -- EX control signals
+        reg_dst => idc_reg_dst,
+        alu_op  => idc_alu_op,
+        alu_src => idc_alu_src,
+        
+        -- MEM control signals
+        branch    => idc_branch,
+        mem_read  => idc_mem_read,
+        mem_write => idc_mem_write,
+        
+        -- WB Control signals
+        reg_write  => idc_reg_write,
+        mem_to_reg => idc_mem_to_reg
     );
     
     -- Instruction Memory
