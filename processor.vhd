@@ -554,6 +554,9 @@ begin
     
     -- PC source
     mem_pc_src <= memc_branch and mem_zero;
+	
+    -- Zero flag
+    ex_zero <= ex_flags.zero;
     
     -- MUX: PC Source
     if_pc_next <= if_pc_1 when mem_pc_src = '0' else mem_target;
@@ -567,4 +570,7 @@ begin
     -- MUX: Memory To Registry
     wb_wb <= wb_res when wbc_mem_to_reg = '0' else wb_mem;
     
+	-- Enable pipeline (TODO : Only for stalling)
+	pipeline_enable <= processor_enable;
+	
 end Behavioral;
