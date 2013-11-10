@@ -15,8 +15,8 @@ use WORK.MIPS_CONSTANT_PKG.ALL;
 entity id_ex is
     port( 
         -- EX control signals
-        alu_func_in   : in  STD_LOGIC_VECTOR(ALU_FUNC_WIDTH-1 downto 0);
-        alu_func_out  : out STD_LOGIC_VECTOR(ALu_FUNC_WIDTH-1 downto 0);
+        alu_func_in   : in  ALU_FUNC;
+        alu_func_out  : out ALU_FUNC;
         alu_src_in    : in  STD_LOGIC;
         alu_src_out   : out STD_LOGIC;
         shift_src_in  : in  STD_LOGIC;
@@ -75,7 +75,7 @@ begin
     begin
         if reset = '1' then
             -- EX
-            alu_func_out <= (others => '0'); --TODO
+            alu_func_out <= ALU_NA;
             alu_src_out <= '0';
             shift_src_out <= '0';
             

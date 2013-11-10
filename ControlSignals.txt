@@ -35,3 +35,44 @@ lw          | 0      | X  | 0    | 0    | 0   | 1      | X        | 1      | Add
 sw          | 0      | X  | 0    | 0    | X   | X      | X        | 1      | Add     | X        | 0
 
 Note: LW must be followed by a NOP if the next function uses the result
+
+add 100000
+sub 100010
+
+and 100100
+or  100101
+xor 100110
+nor 100111
+
+sll 000000
+srl 000010
+sra 000011
+
+TODO:
+    IF
+x        PC
+x        Add
+        EQ
+        Jump
+        Branch-ish
+    ID
+x        Decoder
+        Control Unit
+        Regs
+        Sign_Extend
+    EX
+        FORWARD_S
+        FORWARD_T
+x        SHIFT_SRC
+x        ALU_SRC
+x        ALU
+        Forward Unit
+    MEM
+        Add
+        Conc
+        SLT
+        Link_Res
+        ZeroTester
+        Link_Addr
+    WB
+        MemToReg

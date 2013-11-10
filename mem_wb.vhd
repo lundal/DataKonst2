@@ -21,8 +21,6 @@ entity mem_wb is
         mem_to_reg_out : out STD_lOGIC;
         
         -- Signals
-        pc_in   : in  STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-        pc_out  : out STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
         res_in  : in  STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
         res_out : out STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
         mem_in  : in  STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
@@ -39,7 +37,7 @@ end mem_wb;
 
 architecture Behavioral of mem_wb is
 begin
-    process(clk, reset, enable, reg_write_in, mem_to_reg_in, pc_in, res_in, mem_in, rda_in)
+    process(clk, reset, enable, reg_write_in, mem_to_reg_in, res_in, mem_in, rda_in)
     begin
         if reset = '1' then
             -- WB
@@ -47,7 +45,6 @@ begin
             mem_to_reg_out <= '0';
             
             -- Signals
-            pc_out <= (others => '0');
             res_out <= (others => '0');
             mem_out <= (others => '0');
             rda_out <= (others => '0');
@@ -57,7 +54,6 @@ begin
             mem_to_reg_out <= mem_to_reg_in;
             
             -- Signals
-            pc_out <= pc_in;
             res_out <= res_in;
             mem_out <= mem_in;
             rda_out <= rda_in;
