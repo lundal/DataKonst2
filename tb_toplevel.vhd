@@ -22,67 +22,68 @@ ARCHITECTURE behavior OF tb_toplevel IS
      );
    END COMPONENT;
     
-   --Inputs
-   signal clk : std_logic := '0';
-   signal reset : std_logic := '0';
-   signal command : std_logic_vector(0 to 31) := (others => '0');
-   signal bus_address_in : std_logic_vector(0 to 31) := (others => '0');
-   signal bus_data_in : std_logic_vector(0 to 31) := (others => '0');
+    --Inputs
+    signal clk : std_logic := '0';
+    signal reset : std_logic := '0';
+    signal command : std_logic_vector(0 to 31) := (others => '0');
+    signal bus_address_in : std_logic_vector(0 to 31) := (others => '0');
+    signal bus_data_in : std_logic_vector(0 to 31) := (others => '0');
 
- 	--Outputs
-   signal status : std_logic_vector(0 to 31);
-   signal bus_data_out : std_logic_vector(0 to 31);
+    --Outputs
+    signal status : std_logic_vector(0 to 31);
+    signal bus_data_out : std_logic_vector(0 to 31);
 
-   -- Clock period definitions
-   constant clk_period : time := 40 ns;
-	
-	constant zero : std_logic_vector(0 to 31)  := "00000000000000000000000000000000";
-	constant addr1 : std_logic_vector(0 to 31) := "00000000000000000000000000000001";
-	constant addr2 : std_logic_vector(0 to 31) := "00000000000000000000000000000010";
-	constant addr3 : std_logic_vector(0 to 31) := "00000000000000000000000000000011";
-	constant addr4 : std_logic_vector(0 to 31) := "00000000000000000000000000000100";
-	constant addr5 : std_logic_vector(0 to 31) := "00000000000000000000000000000101";
-	constant addr6 : std_logic_vector(0 to 31) := "00000000000000000000000000000110";
-	constant addr7 : std_logic_vector(0 to 31) := "00000000000000000000000000000111";
-	constant addr8 : std_logic_vector(0 to 31) := "00000000000000000000000000001000";
-	constant addr9 : std_logic_vector(0 to 31) := "00000000000000000000000000001001";
-	constant addr10: std_logic_vector(0 to 31) := "00000000000000000000000000001010";
-  constant addr11: std_logic_vector(0 to 31) := "00000000000000000000000000001011";
-  constant addr12: std_logic_vector(0 to 31) := "00000000000000000000000000001100";
-  constant addr13: std_logic_vector(0 to 31) := "00000000000000000000000000001101";
-  constant addr14: std_logic_vector(0 to 31) := "00000000000000000000000000001110";
-  constant addr15: std_logic_vector(0 to 31) := "00000000000000000000000000001111";
-  constant addr16: std_logic_vector(0 to 31) := "00000000000000000000000000010000";
-  constant addr17: std_logic_vector(0 to 31) := "00000000000000000000000000010001";
+    -- Clock period definitions
+    constant clk_period : time := 40 ns;
 
-  -- This is written to memory initially
-  constant data1 : std_logic_vector(0 to 31):= "00000000000000000000000000000010";
-	constant data2 : std_logic_vector(0 to 31):= "00000000000000000000000000001010";
-  
-  -- These are the instructions executed by the CPU (loaded to instruction-memory)
-  constant ins0  : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins1  : std_logic_vector(0 to 31) := OP_LW  & "00000" & "00001" & "0000000000000001"; -- lw r1, 1(r0)
-  constant ins2  : std_logic_vector(0 to 31) := OP_LW  & "00000" & "00010" & "0000000000000010"; -- lw r2, 2(r0)
-  constant ins3  : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins4  : std_logic_vector(0 to 31) := OP_RCODE & "00001" & "00010" & "00011" & "00000" & FUNC_ADD; -- add r3, r1, r2
-  constant ins5  : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins6  : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins7  : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins8  : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins9  : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins10 : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins11 : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins12 : std_logic_vector(0 to 31) := OP_JUMP & "00000000000000000000001000"; -- jump 8
-  constant ins13 : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins14 : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins15 : std_logic_vector(0 to 31) := (others => '0'); -- nop
-   
-  -- Used to control the COM-module
-  constant CMD_IDLE	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
-	constant CMD_WI	  : std_logic_vector(0 to 31) := "00000000000000000000000000000001";
-	constant CMD_RD	  : std_logic_vector(0 to 31) := "00000000000000000000000000000010";
-	constant CMD_WD	  : std_logic_vector(0 to 31) := "00000000000000000000000000000011";
-	constant CMD_RUN	: std_logic_vector(0 to 31) := "00000000000000000000000000000100";
+    constant zero : std_logic_vector(0 to 31)  := "00000000000000000000000000000000";
+    constant addr1 : std_logic_vector(0 to 31) := "00000000000000000000000000000001";
+    constant addr2 : std_logic_vector(0 to 31) := "00000000000000000000000000000010";
+    constant addr3 : std_logic_vector(0 to 31) := "00000000000000000000000000000011";
+    constant addr4 : std_logic_vector(0 to 31) := "00000000000000000000000000000100";
+    constant addr5 : std_logic_vector(0 to 31) := "00000000000000000000000000000101";
+    constant addr6 : std_logic_vector(0 to 31) := "00000000000000000000000000000110";
+    constant addr7 : std_logic_vector(0 to 31) := "00000000000000000000000000000111";
+    constant addr8 : std_logic_vector(0 to 31) := "00000000000000000000000000001000";
+    constant addr9 : std_logic_vector(0 to 31) := "00000000000000000000000000001001";
+    constant addr10: std_logic_vector(0 to 31) := "00000000000000000000000000001010";
+    constant addr11: std_logic_vector(0 to 31) := "00000000000000000000000000001011";
+    constant addr12: std_logic_vector(0 to 31) := "00000000000000000000000000001100";
+    constant addr13: std_logic_vector(0 to 31) := "00000000000000000000000000001101";
+    constant addr14: std_logic_vector(0 to 31) := "00000000000000000000000000001110";
+    constant addr15: std_logic_vector(0 to 31) := "00000000000000000000000000001111";
+    constant addr16: std_logic_vector(0 to 31) := "00000000000000000000000000010000";
+    constant addr17: std_logic_vector(0 to 31) := "00000000000000000000000000010001";
+
+    -- This is written to memory initially
+    constant data1 : std_logic_vector(0 to 31):= "00000000000000000000000000000010";
+    constant data2 : std_logic_vector(0 to 31):= "00000000000000000000000000001010";
+    constant data3 : std_logic_vector(0 to 31):= "00000000000000000000000000101010";
+
+    -- These are the instructions executed by the CPU (loaded to instruction-memory)
+    constant ins0	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+    constant ins1	: std_logic_vector(0 to 31) := "10001100000000010000000000000001";
+    constant ins2	: std_logic_vector(0 to 31) := "10001100000000100000000000000010";
+    constant ins3	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+    constant ins4	: std_logic_vector(0 to 31) := "00000000001000100010000000100000";
+    constant ins5	: std_logic_vector(0 to 31) := "00000000001000100010100000100000";
+    constant ins6	: std_logic_vector(0 to 31) := "00000000001000100011000000100000";
+    constant ins7	: std_logic_vector(0 to 31) := "00001000000000000000000000001010";
+    constant ins8	: std_logic_vector(0 to 31) := "00000000001000100011100000100000";
+    constant ins9	: std_logic_vector(0 to 31) := "00000000001000100100000000100000";
+    constant ins10	: std_logic_vector(0 to 31) := "00000000001000100100100000100000";
+    constant ins11	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+    constant ins12	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+    constant ins13	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+    constant ins14	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+    constant ins15	: std_logic_vector(0 to 31) := "00001000000000000000000000001011";
+    
+    -- Used to control the COM-module
+    constant CMD_IDLE	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+    constant CMD_WI	  : std_logic_vector(0 to 31) := "00000000000000000000000000000001";
+    constant CMD_RD	  : std_logic_vector(0 to 31) := "00000000000000000000000000000010";
+    constant CMD_WD	  : std_logic_vector(0 to 31) := "00000000000000000000000000000011";
+    constant CMD_RUN	: std_logic_vector(0 to 31) := "00000000000000000000000000000100";
 	
 BEGIN
  
@@ -118,8 +119,8 @@ BEGIN
 
     -- insert stimulus here 
     
-		-- INSTR: WRITE DATA TO DMEM
-		command <= CMD_WD;					
+	-- INSTR: WRITE DATA TO DMEM
+	command <= CMD_WD;					
     bus_address_in <= addr1;
     bus_data_in <= data1;
     wait for clk_period*3;
@@ -132,6 +133,16 @@ BEGIN
     command <= CMD_WD;					
     bus_address_in <= addr2;
     bus_data_in <= data2;
+    wait for clk_period*3;
+      
+    command <= CMD_IDLE;					
+    bus_address_in <= zero;
+    bus_data_in <= zero;
+    wait for clk_period*3;
+    
+    command <= CMD_WD;					
+    bus_address_in <= addr3;
+    bus_data_in <= data3;
     wait for clk_period*3;
       
     command <= CMD_IDLE;					
