@@ -284,7 +284,6 @@ architecture Behavioral of processor is
     signal if_pc        : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
     signal if_pc_1      : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
     signal if_pc_next   : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
-    signal if_pc_next_1 : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
     signal if_inst      : STD_LOGIC_VECTOR(INST_WIDTH-1 downto 0) := (others => '0');
     
     -- ID control signals
@@ -401,6 +400,7 @@ architecture Behavioral of processor is
     signal reset_mem_wb : STD_LOGIC := '0';
     
     -- Other signals
+    signal flush : STD_LOGIC := '0';
     signal pipeline_enable : STD_LOGIC := '0';
     
 begin
@@ -545,18 +545,6 @@ begin
     -- INSTRUCTION FETCH --
     -----------------------
     
-    REG_PC : pc
-    port map(
-        -- Signals
-        pc_in  => if_pc_next_1,
-        pc_out => if_pc,
-        
-        -- Pipeline signals
-        clk    => clk,
-        reset  => reset,
-        enable => pipeline_enable
-    );
-	
     IF_PC_INC : Adder
     generic map(
         N => PC_WIDTH
@@ -576,10 +564,10 @@ begin
     if_eq <= mem_zero when mem_eq = '1' else not mem_zero;
     
     -- MUX : Branch
-    if_pc_next <= mem_branch_addr when (mem_branch and if_eq) = '1' else if_pc_1;
+    if_pc_next <= mem_branch_addr when (mem_branch and if_eq) = '1' else id_pc;
     
     -- MUX : Jump
-    if_pc_next_1 <= if_pc_next when mem_jump = NO_JUMP else mem_jump_addr when mem_jump = JUMP else mem_jump_reg_addr;
+    if_pc <= if_pc_next when mem_jump = NO_JUMP else mem_jump_addr when mem_jump = JUMP else mem_jump_reg_addr;
     
     ------------------------
     -- INSTRUCTION DECODE --
@@ -750,9 +738,12 @@ begin
     
     -- Reset signals
     reset_if_id <= reset;
-    reset_id_ex <= reset;
-    reset_ex_mem <= reset;
+    reset_id_ex <= reset or flush;
+    reset_ex_mem <= reset or flush;
     reset_mem_wb <= reset;
+    
+    -- Flush signal
+    flush <= mem_jump != NO_JUMP;
     
 	-- Enable pipeline (TODO : Only for stalling)
 	pipeline_enable <= processor_enable;

@@ -39,25 +39,30 @@ architecture Behavioral of mem_wb is
 begin
     process(clk, reset, enable, reg_write_in, mem_to_reg_in, res_in, mem_in, rda_in)
     begin
-        if reset = '1' then
-            -- WB
-            reg_write_out <= '0';
-            mem_to_reg_out <= '0';
-            
-            -- Signals
-            res_out <= (others => '0');
-            mem_out <= (others => '0');
-            rda_out <= (others => '0');
-        elsif rising_edge(clk) and enable = '1' then
-            -- WB
-            reg_write_out <= reg_write_in;
-            mem_to_reg_out <= mem_to_reg_in;
-            
-            -- Signals
-            res_out <= res_in;
-            mem_out <= mem_in;
-            rda_out <= rda_in;
+        if rising_edge(clk) then
+            if reset = '1' then
+                -- WB
+                reg_write_out <= '0';
+                mem_to_reg_out <= '0';
+                
+                -- Signals
+                res_out <= (others => '0');
+                --mem_out <= (others => '0');
+                rda_out <= (others => '0');
+            elsif enable = '1' then
+                -- WB
+                reg_write_out <= reg_write_in;
+                mem_to_reg_out <= mem_to_reg_in;
+                
+                -- Signals
+                res_out <= res_in;
+                --mem_out <= mem_in;
+                rda_out <= rda_in;
+            end if;
         end if;
     end process;
+    
+    mem_out <= (others =>'0') when reset = '1' else mem_in;
+    
 end Behavioral;
 

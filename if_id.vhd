@@ -31,15 +31,20 @@ architecture Behavioral of if_id is
 begin
     process(clk, reset, enable, pc_in, inst_in)
     begin
-        if reset = '1' then
-            -- Signals
-            pc_out <= (others => '0');
-            inst_out <= (others => '0');
-        elsif rising_edge(clk) and enable = '1' then
-            -- Signals
-            pc_out <= pc_in;
-            inst_out <= inst_in;
+        if rising_edge(clk) then
+            if reset = '1' then
+                -- Signals
+                pc_out <= (others => '0');
+                --inst_out <= (others => '0');
+            elsif enable = '1' then
+                -- Signals
+                pc_out <= pc_in;
+                --inst_out <= inst_in;
+            end if;
         end if;
     end process;
+    
+    inst_out <= (others =>'0') when reset = '1' else inst_in;
+    
 end Behavioral;
 
