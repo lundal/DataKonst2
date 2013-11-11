@@ -20,6 +20,8 @@ def main():
 
         if cmd == ';':
             pass
+        elif cmd == 'nop':
+            string += '00000000000000000000000000000000'
         elif cmd == 'add':
             # add
             rd = int(code[1].replace("r", ""))
