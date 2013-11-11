@@ -2,6 +2,8 @@
 
 ## Instructions
 
+__nop__ 
+
 __add__ _rd_ _rs_ _rt_
 
 __sub__ _rd_ _rs_ _rt_
