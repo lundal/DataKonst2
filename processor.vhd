@@ -307,6 +307,8 @@ architecture Behavioral of processor is
     signal id_func   : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := (others => '0');
     signal id_rs     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
     signal id_rt     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal id_rs_reg : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal id_rt_reg : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
     signal id_rsa    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal id_rta    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal id_rda    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
@@ -620,10 +622,28 @@ begin
         RT_ADDR    => id_rta,
         RD_ADDR    => wb_rda,
         WRITE_DATA => wb_wb,
-        RS         => id_rs,
-        RT         => id_rt
+        RS         => id_rs_reg,
+        RT         => id_rt_reg
     );
     
+    FORWARD_RS : process(wb_reg_write, wb_rda, id_rsa, wb_rda, wb_wb, id_rs_reg)
+    begin
+        if wb_reg_write = '1' and wb_rda = id_rsa and wb_rda /= (REG_ADDR_WIDTH-1 downto 0 => '0') then
+            id_rs <= wb_wb;
+        else
+            id_rs <= id_rs_reg;
+        end if;
+    end process;
+    
+    FORWARD_RT : process(wb_reg_write, wb_rda, id_rta, wb_rda, wb_wb, id_rt_reg)
+    begin
+        if wb_reg_write = '1' and wb_rda = id_rta and wb_rda /= (REG_ADDR_WIDTH-1 downto 0 => '0') then
+            id_rt <= wb_wb;
+        else
+            id_rt <= id_rt_reg;
+        end if;
+    end process;
+
     -- Sign Extender
     id_imm_x <= ZERO16 & id_imm when id_imm(16-1) = '0' else ONE16 & id_imm;
     
@@ -743,7 +763,7 @@ begin
     reset_mem_wb <= reset;
     
     -- Flush signal
-    flush <= mem_jump != NO_JUMP;
+    flush <= '1' when mem_jump /= NO_JUMP else '0';
     
 	-- Enable pipeline (TODO : Only for stalling)
 	pipeline_enable <= processor_enable;
