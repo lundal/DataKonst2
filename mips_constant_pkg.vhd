@@ -26,12 +26,17 @@ package MIPS_CONSTANT_PKG is
     constant FUNC_SLL : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "000000";
     constant FUNC_SRL : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "000010";
     constant FUNC_SRA : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "000011";
+	constant FUNC_SLLV: STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "000100";
+	constant FUNC_SRLV: STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "000110";
     constant FUNC_ADD : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "100000";
+    constant FUNC_ADDU: STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "100001";
     constant FUNC_SUB : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "100010";
     constant FUNC_AND : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "100100";
     constant FUNC_OR  : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "100101";
     constant FUNC_XOR : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "100110";
     constant FUNC_NOR : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "100110";
+	constant FUNC_JR  : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "001000";
+    constant FUNC_SLT : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := "101010";
 
     
     -- Handy values
@@ -42,6 +47,24 @@ package MIPS_CONSTANT_PKG is
     constant ONE16  : STD_LOGIC_VECTOR(15 downto 0) := "1111111111111111";
     constant ONE32  : STD_LOGIC_VECTOR(31 downto 0) := "11111111111111111111111111111111";
     
+	 
+	 -- opcodes
+	 constant OP_RCODE	    : STD_LOGIC_VECTOR(5 downto 0) := "000000";
+	 constant OP_ADDI		: STD_LOGIC_VECTOR(5 downto 0) := "001000";
+	 constant OP_ADDIU	    : STD_LOGIC_VECTOR(5 downto 0) := "001001";
+	 constant OP_ANDI		: STD_LOGIC_VECTOR(5 downto 0) := "001100";
+	 constant OP_BEQ		: STD_LOGIC_VECTOR(5 downto 0) := "000100";
+	 constant OP_BNEQ		: STD_LOGIC_VECTOR(5 downto 0) := "000101";
+	 constant OP_JUMP		: STD_LOGIC_VECTOR(5 downto 0) := "000010";
+	 constant OP_JAL		: STD_LOGIC_VECTOR(5 downto 0) := "000011";
+	 constant OP_LUI		: STD_LOGIC_VECTOR(5 downto 0) := "001111";
+	 constant OP_LW		    : STD_LOGIC_VECTOR(5 downto 0) := "100011";
+	 constant OP_SW		    : STD_LOGIC_VECTOR(5 downto 0) := "101011";
+	 constant OP_XORI		: STD_LOGIC_VECTOR(5 downto 0) := "001110";
+     constant OP_SLTI       : STD_LOGIC_VECTOR(5 downto 0) := "001010";
+	 
+	 
+	 
 --    -- Control signal records (TODO if time)
 --    type CTRL_ID is
 --    record
