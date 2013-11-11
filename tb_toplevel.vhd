@@ -1,33 +1,8 @@
---------------------------------------------------------------------------------
--- Company: 
--- Engineer:
---
--- Create Date:   15:54:20 05/03/2012
--- Design Name:   
--- Module Name:   E:/My-documents/Dropbox/tdt4255_final/single_cycle/tb_toplevel.vhd
--- Project Name:  single_cycle
--- Target Device:  
--- Tool versions:  
--- Description:   
--- 
--- VHDL Test Bench Created by ISE for module: toplevel
--- 
--- Dependencies:
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
---
--- Notes: 
--- This testbench has been automatically generated using types std_logic and
--- std_logic_vector for the ports of the unit under test.  Xilinx recommends
--- that these types always be used for the top-level I/O of a design in order
--- to guarantee that the testbench will bind correctly to the post-implementation 
--- simulation model.
---------------------------------------------------------------------------------
-
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
+
+library WORK;
+use WORK.MIPS_CONSTANT_PKG.ALL;
 
 ENTITY tb_toplevel IS
 END tb_toplevel;
@@ -85,23 +60,22 @@ ARCHITECTURE behavior OF tb_toplevel IS
 	constant data2 : std_logic_vector(0 to 31):= "00000000000000000000000000001010";
   
   -- These are the instructions executed by the CPU (loaded to instruction-memory)
-  -- See ins.txt for what they actually mean (that is a file used when loading them to the FPGA)
-  constant ins0  : std_logic_vector(0 to 31) := X"8C010001";
-  constant ins1  : std_logic_vector(0 to 31) := X"8C020002";
-  constant ins2  : std_logic_vector(0 to 31) := X"8C020002";
-  constant ins3  : std_logic_vector(0 to 31) := X"00221820";
-  constant ins4  : std_logic_vector(0 to 31) := X"AC030005";
-  constant ins5  : std_logic_vector(0 to 31) := X"10000002";
-  constant ins6  : std_logic_vector(0 to 31) := X"AC030003";
-  constant ins7  : std_logic_vector(0 to 31) := X"AC030004";
-  constant ins8  : std_logic_vector(0 to 31) := X"AC030006";
-  constant ins9  : std_logic_vector(0 to 31) := X"AC030007";
-  constant ins10 : std_logic_vector(0 to 31) := X"3C030006";
-  constant ins11 : std_logic_vector(0 to 31) := X"AC030008";
-  constant ins12 : std_logic_vector(0 to 31) := X"00231820";
-  constant ins13 : std_logic_vector(0 to 31) := X"AC030009";
-  constant ins14 : std_logic_vector(0 to 31) := X"1000FFFD";
-  constant ins15 : std_logic_vector(0 to 31) := X"AC03000A";
+  constant ins0  : std_logic_vector(0 to 31) := OP_LW  & "00000" & "00001" & "0000000000000001"; -- lw r1, 1(r0)
+  constant ins1  : std_logic_vector(0 to 31) := OP_LW  & "00000" & "00010" & "0000000000000010"; -- lw r2, 2(r0)
+  constant ins2  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins3  : std_logic_vector(0 to 31) := OP_RCODE & "00001" & "00010" & "00011" & "00000" & FUNC_ADD; -- add r3, r1, r2
+  constant ins4  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins5  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins6  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins7  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins8  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins9  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins10 : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins11 : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins12 : std_logic_vector(0 to 31) := OP_JUMP & "00000000000000000000001000"; -- jump 8
+  constant ins13 : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins14 : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins15 : std_logic_vector(0 to 31) := (others => '0'); -- nop
    
   -- Used to control the COM-module
   constant CMD_IDLE	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
@@ -138,7 +112,9 @@ BEGIN
   begin		
 	
     -- hold reset state for 20 ns.
-    wait for 20 ns;	
+    reset <= '1';
+    wait for 20 ns;
+    reset <= '0';
 
     -- insert stimulus here 
     
@@ -338,13 +314,11 @@ BEGIN
     bus_address_in <= zero;
     bus_data_in <= zero;
     wait for clk_period*3;
-		
+	
     -- Run CPU!
-		command <= CMD_RUN;					
+	command <= CMD_RUN;					
     bus_address_in <= zero;
     bus_data_in <= zero;
-		wait for clk_period*100;
-
     wait;
     
  end process;

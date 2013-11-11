@@ -280,128 +280,128 @@ architecture Behavioral of processor is
     end component;
     
     -- IF signals
-    signal if_eq        : STD_LOGIC;
-    signal if_pc        : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal if_pc_1      : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal if_pc_next   : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal if_pc_next_1 : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal if_inst      : STD_LOGIC_VECTOR(INST_WIDTH-1 downto 0);
+    signal if_eq        : STD_LOGIC := '0';
+    signal if_pc        : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
+    signal if_pc_1      : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
+    signal if_pc_next   : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
+    signal if_pc_next_1 : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
+    signal if_inst      : STD_LOGIC_VECTOR(INST_WIDTH-1 downto 0) := (others => '0');
     
     -- ID control signals
-    signal id_reg_dst    : STD_LOGIC;
-    signal id_alu_func   : ALU_FUNC;
-    signal id_alu_src    : STD_LOGIC;
-    signal id_shift_src  : STD_LOGIC;
-    signal id_eq         : STD_LOGIC;
-    signal id_slt        : STD_LOGIC;
-    signal id_link       : STD_LOGIC;
-    signal id_jump       : JUMP_TYPE;
-    signal id_branch     : STD_LOGIC;
-    signal id_mem_write  : STD_LOGIC;
-    signal id_reg_write  : STD_LOGIC;
-    signal id_mem_to_reg : STD_lOGIC;
+    signal id_reg_dst    : STD_LOGIC := '0';
+    signal id_alu_func   : ALU_FUNC := ALU_NA;
+    signal id_alu_src    : STD_LOGIC := '0';
+    signal id_shift_src  : STD_LOGIC := '0';
+    signal id_eq         : STD_LOGIC := '0';
+    signal id_slt        : STD_LOGIC := '0';
+    signal id_link       : STD_LOGIC := '0';
+    signal id_jump       : JUMP_TYPE := NO_JUMP;
+    signal id_branch     : STD_LOGIC := '0';
+    signal id_mem_write  : STD_LOGIC := '0';
+    signal id_reg_write  : STD_LOGIC := '0';
+    signal id_mem_to_reg : STD_lOGIC := '0';
     
     -- ID signals
-    signal id_pc     : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal id_inst   : STD_LOGIC_VECTOR(INST_WIDTH-1 downto 0);
-    signal id_opcode : STD_LOGIC_VECTOR(OPCODE_WIDTH-1 downto 0);
-    signal id_func   : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0);
-    signal id_rs     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal id_rt     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal id_rsa    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal id_rta    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal id_rda    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal id_wba    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal id_imm    : STD_LOGIC_VECTOR(16-1 downto 0);
-    signal id_imm_x  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal id_shift  : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal id_target : STD_LOGIC_VECTOR(TARGET_WIDTH-1 downto 0);
+    signal id_pc     : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
+    signal id_inst   : STD_LOGIC_VECTOR(INST_WIDTH-1 downto 0) := (others => '0');
+    signal id_opcode : STD_LOGIC_VECTOR(OPCODE_WIDTH-1 downto 0) := (others => '0');
+    signal id_func   : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := (others => '0');
+    signal id_rs     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal id_rt     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal id_rsa    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal id_rta    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal id_rda    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal id_wba    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal id_imm    : STD_LOGIC_VECTOR(16-1 downto 0) := (others => '0');
+    signal id_imm_x  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal id_shift  : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal id_target : STD_LOGIC_VECTOR(TARGET_WIDTH-1 downto 0) := (others => '0');
     
     -- EX control signals
-    signal ex_alu_func   : ALU_FUNC;
-    signal ex_alu_src    : STD_LOGIC;
-    signal ex_shift_src  : STD_LOGIC;
-    signal ex_eq         : STD_LOGIC;
-    signal ex_slt        : STD_LOGIC;
-    signal ex_link       : STD_LOGIC;
-    signal ex_jump       : JUMP_TYPE;
-    signal ex_branch     : STD_LOGIC;
-    signal ex_mem_write  : STD_LOGIC;
-    signal ex_reg_write  : STD_LOGIC;
-    signal ex_mem_to_reg : STD_lOGIC;
+    signal ex_alu_func   : ALU_FUNC := ALU_NA;
+    signal ex_alu_src    : STD_LOGIC := '0';
+    signal ex_shift_src  : STD_LOGIC := '0';
+    signal ex_eq         : STD_LOGIC := '0';
+    signal ex_slt        : STD_LOGIC := '0';
+    signal ex_link       : STD_LOGIC := '0';
+    signal ex_jump       : JUMP_TYPE := NO_JUMP;
+    signal ex_branch     : STD_LOGIC := '0';
+    signal ex_mem_write  : STD_LOGIC := '0';
+    signal ex_reg_write  : STD_LOGIC := '0';
+    signal ex_mem_to_reg : STD_lOGIC := '0';
     
     -- EX signals
-    signal ex_pc     : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal ex_rs     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal ex_rt     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal ex_rs_fwd : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal ex_rt_fwd : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal ex_imm    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal ex_alu_x  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal ex_alu_y  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal ex_alu_s  : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal ex_rsa    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal ex_rta    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal ex_rda    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal ex_res    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal ex_shift  : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal ex_target : STD_LOGIC_VECTOR(TARGET_WIDTH-1 downto 0);
+    signal ex_pc     : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
+    signal ex_rs     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal ex_rt     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal ex_rs_fwd : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal ex_rt_fwd : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal ex_imm    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal ex_alu_x  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal ex_alu_y  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal ex_alu_s  : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal ex_rsa    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal ex_rta    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal ex_rda    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal ex_res    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal ex_shift  : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal ex_target : STD_LOGIC_VECTOR(TARGET_WIDTH-1 downto 0) := (others => '0');
     
     -- EX forward signals
-    signal ex_fwd_rs : FORWARD_TYPE;
-    signal ex_fwd_rt : FORWARD_TYPE;
+    signal ex_fwd_rs : FORWARD_TYPE := NO_FORWARD;
+    signal ex_fwd_rt : FORWARD_TYPE := NO_FORWARD;
     
     -- MEM control signals
-    signal mem_eq         : STD_LOGIC;
-    signal mem_slt        : STD_LOGIC;
-    signal mem_link       : STD_LOGIC;
-    signal mem_jump       : JUMP_TYPE;
-    signal mem_branch     : STD_LOGIC;
-    signal mem_mem_write  : STD_LOGIC;
-    signal mem_reg_write  : STD_LOGIC;
-    signal mem_mem_to_reg : STD_lOGIC;
+    signal mem_eq         : STD_LOGIC := '0';
+    signal mem_slt        : STD_LOGIC := '0';
+    signal mem_link       : STD_LOGIC := '0';
+    signal mem_jump       : JUMP_TYPE := NO_JUMP;
+    signal mem_branch     : STD_LOGIC := '0';
+    signal mem_mem_write  : STD_LOGIC := '0';
+    signal mem_reg_write  : STD_LOGIC := '0';
+    signal mem_mem_to_reg : STD_lOGIC := '0';
     
     -- MEM signals
-    signal mem_pc     : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal mem_mem    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal mem_rs     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal mem_rt     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal mem_rda    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal mem_wba    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal mem_res    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal mem_res_1  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal mem_res_2    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal mem_imm    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal mem_target : STD_LOGIC_VECTOR(TARGET_WIDTH-1 downto 0);
+    signal mem_pc     : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
+    signal mem_mem    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal mem_rs     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal mem_rt     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal mem_rda    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal mem_wba    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal mem_res    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal mem_res_1  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal mem_res_2    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal mem_imm    : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal mem_target : STD_LOGIC_VECTOR(TARGET_WIDTH-1 downto 0) := (others => '0');
     
     -- MEM Jump/Branch signals
-    signal mem_jump_reg_addr : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal mem_jump_addr     : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal mem_branch_addr   : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
+    signal mem_jump_reg_addr : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
+    signal mem_jump_addr     : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
+    signal mem_branch_addr   : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
     
     -- MEM Sign signals
-    signal mem_pos  : STD_lOGIC;
-    signal mem_zero : STD_lOGIC;
-    signal mem_neg  : STD_lOGIC;
+    signal mem_pos  : STD_lOGIC := '0';
+    signal mem_zero : STD_lOGIC := '0';
+    signal mem_neg  : STD_lOGIC := '0';
     
     -- WB control signals
-    signal wb_reg_write  : STD_LOGIC;
-    signal wb_mem_to_reg : STD_lOGIC;
+    signal wb_reg_write  : STD_LOGIC := '0';
+    signal wb_mem_to_reg : STD_lOGIC := '0';
     
     -- WB signals
-    signal wb_mem : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal wb_res : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
-    signal wb_rda : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
-    signal wb_wb  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
+    signal wb_mem : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal wb_res : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal wb_rda : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
+    signal wb_wb  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
     
     -- Reset signals
-    signal reset_if_id  : STD_LOGIC;
-    signal reset_id_ex  : STD_LOGIC;
-    signal reset_ex_mem : STD_LOGIC;
-    signal reset_mem_wb : STD_LOGIC;
+    signal reset_if_id  : STD_LOGIC := '0';
+    signal reset_id_ex  : STD_LOGIC := '0';
+    signal reset_ex_mem : STD_LOGIC := '0';
+    signal reset_mem_wb : STD_LOGIC := '0';
     
     -- Other signals
-    signal pipeline_enable : STD_LOGIC;
+    signal pipeline_enable : STD_LOGIC := '0';
     
 begin
     
