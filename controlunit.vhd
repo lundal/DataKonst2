@@ -1,35 +1,10 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    01:28:14 11/11/2013 
--- Design Name: 
--- Module Name:    controlunit - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
-----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+library WORK;
+use WORK.MIPS_CONSTANT_PKG.ALL;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
-entity controlunit is
+entity control_unit is
 			port(
             -- Input
             opcode : in STD_LOGIC_VECTOR(6-1 downto 0);
@@ -47,7 +22,7 @@ entity controlunit is
             eq        : out STD_LOGIC;
             slt       : out STD_LOGIC;
             link      : out STD_LOGIC;
-            jump      : out JUMP_TYPE;
+            jmp       : out JUMP_TYPE;
             branch    : out STD_LOGIC;
             mem_write : out STD_LOGIC;
             
@@ -55,9 +30,9 @@ entity controlunit is
             reg_write  : out STD_LOGIC;
             mem_to_reg : out STD_lOGIC
         );
-end controlunit;
+end control_unit;
 
-architecture Behavioral of controlunit is
+architecture Behavioral of control_unit is
 
 begin
 	process (opcode, func)
@@ -69,7 +44,7 @@ begin
         eq          <= '0';
         slt         <= '0';
         link        <= '0';
-        jump        <= NO_JUMP;
+        jmp         <= NO_JUMP;
         branch      <= '0';
         mem_write   <= '0';
         reg_write   <= '0';
@@ -78,67 +53,137 @@ begin
 		case (opcode) is
 			when OP_RCODE => 
 				case (func) is
+                    -- Shifts
 					when FUNC_SLL =>
                         alu_func <= ALU_SLL;
+                        reg_write <= '1';
 					when FUNC_SRL => 
                         alu_func <= ALU_SRL;
+                        reg_write <= '1';
 					when FUNC_SRA => 
                         alu_func <= ALU_SRA;
+                        reg_write <= '1';
 					when FUNC_SLLV => 
                         alu_func <= ALU_SLL;
-                        alu_src <= '1';
+                        shift_src <= '1';
+                        reg_write <= '1';
 					when FUNC_SRLV => 
                         alu_func <= ALU_SRL;
-                        alu_src <= '1';
-					when (FUNC_ADD OR FUNC_ADDU)=> 
-						alu_func <= ALU_ADD;
-					when FUNC_SUB => 
-                        alu_func <= ALU_SUB;
+                        shift_src <= '1';
+                        reg_write <= '1';
+                    when FUNC_SRAV => 
+                        alu_func <= ALU_SRA;
+                        shift_src <= '1';
+                        reg_write <= '1';
+                    
+                     -- Logical
 					when FUNC_AND => 
                         alu_func <= ALU_AND;
+                        reg_write <= '1';
 					when FUNC_OR => 
                         alu_func <= ALU_OR;
+                        reg_write <= '1';
 					when FUNC_XOR => 
                         alu_func <= ALU_XOR;
+                        reg_write <= '1';
 					when FUNC_NOR => 
                         alu_func <= ALU_NOR;
+                        reg_write <= '1';
+                    
+                    -- Arithmetic
+					when FUNC_ADD => 
+						alu_func <= ALU_ADD;
+                        reg_write <= '1';
+                    when FUNC_ADDU => 
+						alu_func <= ALU_ADD;
+                        reg_write <= '1';
+					when FUNC_SUB => 
+                        alu_func <= ALU_SUB;
+                        reg_write <= '1';
+                    
+                    -- Jump
 					when FUNC_JR => 
-                        jump <= JUMP_REG;
+                        jmp <= JUMP_REG;
+					when FUNC_JALR => 
+                        jmp <= JUMP_REG;
+                        link <= '1';
+                    
+                    -- Others
                     when FUNC_SLT =>
                         slt <= '1';
+                        alu_func <= ALU_SUB;
+                        reg_write <= '1';
+                    when others =>
+                        -- Not supported
 				end case;
-			when (OP_ADDI OR OP_ADDIU) => 
+            
+            -- Immediates
+			when OP_ADDI => 
+                reg_dst <= '1';
 				alu_func <= ALU_ADD;
 				alu_src <= '1';
+                reg_write <= '1';
+            when OP_ADDIU => 
+                reg_dst <= '1';
+				alu_func <= ALU_ADD;
+				alu_src <= '1';
+                reg_write <= '1';
 			when OP_ANDI => 
+                reg_dst <= '1';
                 alu_func <= ALU_AND;
                 alu_src <= '1';
+                reg_write <= '1';
+            when OP_ORI => 
+                reg_dst <= '1';
+                alu_func <= ALU_OR;
+                alu_src <= '1';
+                reg_write <= '1';
+            when OP_XORI => 
+                reg_dst <= '1';
+                alu_func <= ALU_XOR;
+                alu_src <= '1';
+                reg_write <= '1';
+            
+            -- Branch
 			when OP_BEQ => 
                 branch <= '1';
                 eq <= '1';
+                alu_func <= ALU_SUB;
 			when OP_BNEQ => 
                 branch <= '1';
                 eq <= '0';
+                alu_func <= ALU_SUB;
+            
+            -- Jump
 			when OP_JUMP => 
-                jump <= JUMP;
+                jmp <= JUMP;
 			when OP_JAL => 
-                jump <= JUMP;
+                jmp <= JUMP;
                 link <= '1';
-			when OP_LUI => 
-                alu_func <= ALU_SLL;
-                -- TODO: shift 16 bits
-                reg_write <= '1';
+            
+            -- Memory
 			when OP_LW => 
+                reg_dst <= '1';
+                alu_src <= '1';
+                alu_func <= ALU_ADD;
                 mem_to_reg <= '1';
                 reg_write <= '1';
 			when OP_SW => 
-                mem_write <= '1';
-			when OP_XORI => 
-                alu_func <= ALU_XOR;
                 alu_src <= '1';
+                alu_func <= ALU_ADD;
+                mem_write <= '1';
+            
+            -- Others
             when OP_SLTI =>
                 slt <= '1';
+                alu_func <= ALU_SUB;
                 alu_src <= '1';
+                reg_write <= '1';
+			when OP_LUI => 
+                alu_func <= ALU_LUI;
+                reg_write <= '1';
+            when others =>
+                -- Not supported
 		end case;
 	end process;
 

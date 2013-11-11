@@ -236,7 +236,7 @@ architecture Behavioral of processor is
             eq        : out STD_LOGIC;
             slt       : out STD_LOGIC;
             link      : out STD_LOGIC;
-            jump      : out JUMP_TYPE;
+            jmp       : out JUMP_TYPE;
             branch    : out STD_LOGIC;
             mem_write : out STD_LOGIC;
             
@@ -615,7 +615,7 @@ begin
         eq        => id_eq,
         slt       => id_slt,
         link      => id_link,
-        jump      => id_jump,
+        jmp       => id_jump,
         branch    => id_branch,
         mem_write => id_mem_write,
         
