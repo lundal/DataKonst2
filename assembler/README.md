@@ -1,5 +1,8 @@
 # Assembler
 
+Comments starts with ` ; ` (important that you follow with space). Or you can write whatever you want after your instruction on the line.
+
+
 ## Instructions
 
 __nop__ 
