@@ -347,6 +347,10 @@ architecture Behavioral of processor is
     signal ex_shift  : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
     signal ex_target : STD_LOGIC_VECTOR(TARGET_WIDTH-1 downto 0);
     
+    -- EX forward signals
+    signal ex_fwd_rs : FORWARD_TYPE;
+    signal ex_fwd_rt : FORWARD_TYPE;
+    
     -- MEM control signals
     signal mem_eq         : STD_LOGIC;
     signal mem_slt        : STD_LOGIC;
@@ -657,10 +661,10 @@ begin
         
         -- From mem
         mem_addr  => mem_wba,
-        mem_write => mem_reg_write
+        mem_write => mem_reg_write,
         
         -- From wb
-        wb_addr  => wb_wba,
+        wb_addr  => wb_rda,
         wb_write => wb_reg_write,
         
         -- Forwarding
