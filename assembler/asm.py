@@ -5,11 +5,18 @@ import sys
 def main():
     source = open(sys.argv[1], 'r')
     target = open(sys.argv[1].split('.')[0] + '.op', 'w')
+    vhdl = False
+    lnum = 0
+    if len(sys.argv) > 2:
+        if sys.argv[2] == '-v':
+            vhdl = True
     for line in source:
         line = line.strip()
         code = line.split(' ')
         cmd = code[0]
         string = ''
+        if vhdl:
+            string = 'constant ins' + `lnum` + '\t: std_logic_vector(0 to 31) := "'
 
         if cmd == ';':
             pass
@@ -23,7 +30,7 @@ def main():
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(rd)
             string += "00000"
-            string += "100000\n"
+            string += "100000"
         elif cmd == 'sub':
             # sub
             rd = int(code[1].replace("r", ""))
@@ -34,7 +41,7 @@ def main():
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(rd)
             string += "00000"
-            string += "100010\n"
+            string += "100010"
         elif cmd == 'addi':
             # add immediate
             rt = int(code[1].replace("r", ""))
@@ -44,7 +51,7 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
         elif cmd == 'addu':
             # add unsigned
             rd = int(code[1].replace("r", ""))
@@ -55,7 +62,7 @@ def main():
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(rd)
             string += "00000"
-            string += "100001\n"
+            string += "100001"
         elif cmd == 'subu':
             # sub unsigned
             rd = int(code[1].replace("r", ""))
@@ -66,7 +73,7 @@ def main():
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(rd)
             string += "00000"
-            string += "100011\n"
+            string += "100011"
         elif cmd == 'addiu':
             # add immediate unsigned
             rt = int(code[1].replace("r", ""))
@@ -76,7 +83,7 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
         elif cmd == 'and':
             #and
             rd = int(code[1].replace("r", ""))
@@ -87,7 +94,7 @@ def main():
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(rd)
             string += "00000"
-            string += "100100\n"
+            string += "100100"
         elif cmd == 'or':
             # or
             rd = int(code[1].replace("r", ""))
@@ -98,7 +105,7 @@ def main():
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(rd)
             string += "00000"
-            string += "100101\n"
+            string += "100101"
         elif cmd == 'nor':
             # nor
             rd = int(code[1].replace("r", ""))
@@ -109,7 +116,7 @@ def main():
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(rd)
             string += "00000"
-            string += "100111\n"
+            string += "100111"
         elif cmd == 'xor':
             # xor
             rd = int(code[1].replace("r", ""))
@@ -120,7 +127,7 @@ def main():
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(rd)
             string += "00000"
-            string += "100110\n"
+            string += "100110"
         elif cmd == 'andi':
             # and immediate
             rt = int(code[1].replace("r", ""))
@@ -130,7 +137,7 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
         elif cmd == 'ori':
             # or immediate
             rt = int(code[1].replace("r", ""))
@@ -140,7 +147,7 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
             pass
         elif cmd == 'xori':
             # xor immediate
@@ -151,7 +158,7 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
             pass
         elif cmd == 'sll':
             # shift left logical
@@ -163,7 +170,7 @@ def main():
             string += "{0:05b}".format(rd)
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(sh)
-            string += "000000\n"
+            string += "000000"
         elif cmd == 'srl':
             # shift right logical
             rd = int(code[1].replace("r", ""))
@@ -174,7 +181,7 @@ def main():
             string += "{0:05b}".format(rd)
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(sh)
-            string += "000010\n"
+            string += "000010"
         elif cmd == 'sra':
             # shift right arithmetic
             rd = int(code[1].replace("r", ""))
@@ -185,7 +192,7 @@ def main():
             string += "{0:05b}".format(rd)
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(sh)
-            string += "000011\n"
+            string += "000011"
         elif cmd == 'sllv':
             # shift left logical variable
             rd = int(code[1].replace("r", ""))
@@ -196,7 +203,7 @@ def main():
             string += "{0:05b}".format(rd)
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(sh)
-            string += "000100\n"
+            string += "000100"
         elif cmd == 'srlv':
             # shift right logical variable
             rd = int(code[1].replace("r", ""))
@@ -207,7 +214,7 @@ def main():
             string += "{0:05b}".format(rd)
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(sh)
-            string += "000110\n"
+            string += "000110"
         elif cmd == 'srav':
             # shift right arithmetic variable
             rd = int(code[1].replace("r", ""))
@@ -218,7 +225,7 @@ def main():
             string += "{0:05b}".format(rd)
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(sh)
-            string += "000111\n"
+            string += "000111"
             pass
         elif cmd == 'slt':
             # set if less than
@@ -230,7 +237,7 @@ def main():
             string += "{0:05b}".format(rt)
             string += "{0:05b}".format(rd)
             string += "00000"
-            string += "101010\n"
+            string += "101010"
         elif cmd == 'slti':
             # set if less than immediate
             rt = int(code[1].replace("r", ""))
@@ -240,20 +247,20 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
             pass
         elif cmd == 'j':
             # jump uncoditional
             addr = int(code[1])
             string += '000010'
             string += '{0:026b}'.format(addr)
-            string += '\n'
+            string += ''
         elif cmd == 'jal':
             # jump and link
             addr = int(code[1])
             string += '000011'
             string += '{0:026b}'.format(addr)
-            string += '\n'
+            string += ''
         elif cmd == 'jr':
             # jump register
             rs = int(code[1].replace("r", ""))
@@ -262,7 +269,7 @@ def main():
             string += "00000"
             string += "00000"
             string += "00000"
-            string += "001000\n"
+            string += "001000"
         elif cmd == 'jalr':
             # jump and link register
             rs = int(code[1].replace("r", ""))
@@ -271,7 +278,7 @@ def main():
             string += "00000"
             string += "00000"
             string += "00000"
-            string += "001001\n"
+            string += "001001"
         elif cmd == 'beq':
             # branch if equal
             rt = int(code[1].replace("r", ""))
@@ -281,7 +288,7 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
         elif cmd == 'bne':
             # branch if not equal
             rt = int(code[1].replace("r", ""))
@@ -291,7 +298,7 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
         elif cmd == 'lui':
             # load upper immediate
             rt = int(code[1].replace("r", ""))
@@ -300,7 +307,7 @@ def main():
             string += '00000'
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
         elif cmd == 'lw':
             # load word
             rt = int(code[1].replace("r", ""))
@@ -310,7 +317,7 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
         elif cmd == 'sw':
             # store word
             rt = int(code[1].replace("r", ""))
@@ -320,9 +327,13 @@ def main():
             string += '{0:05b}'.format(rs)
             string += '{0:05b}'.format(rt)
             string += '{0:016b}'.format(imm)
-            string += '\n'
+            string += ''
 
+        if vhdl:
+            string += '";'
+        string += '\n'
         target.write(string)
+        lnum += 1
     target.close()
 
 main()
