@@ -394,6 +394,12 @@ architecture Behavioral of processor is
     signal wb_rda : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
     signal wb_wb  : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0);
     
+    -- Reset signals
+    signal reset_if_id  : STD_LOGIC;
+    signal reset_id_ex  : STD_LOGIC;
+    signal reset_ex_mem : STD_LOGIC;
+    signal reset_mem_wb : STD_LOGIC;
+    
     -- Other signals
     signal pipeline_enable : STD_LOGIC;
     
@@ -409,7 +415,7 @@ begin
         
         -- Pipeline signals
         clk    => clk,
-        reset  => reset,
+        reset  => reset_if_id,
         enable => pipeline_enable
     );
     
@@ -465,7 +471,7 @@ begin
         
         -- Pipeline signals
         clk    => clk,
-        reset  => reset,
+        reset  => reset_id_ex,
         enable => pipeline_enable
     );
     
@@ -509,7 +515,7 @@ begin
         
         -- Pipeline signals
         clk    => clk,
-        reset  => reset,
+        reset  => reset_ex_mem,
         enable => pipeline_enable
     );
     
@@ -531,7 +537,7 @@ begin
         
         -- Pipeline signals
         clk    => clk,
-        reset  => reset,
+        reset  => reset_mem_wb,
         enable => pipeline_enable
     );
     
@@ -741,6 +747,12 @@ begin
     -----------
     -- OTHER --
     -----------
+    
+    -- Reset signals
+    reset_if_id <= reset;
+    reset_id_ex <= reset;
+    reset_ex_mem <= reset;
+    reset_mem_wb <= reset;
     
 	-- Enable pipeline (TODO : Only for stalling)
 	pipeline_enable <= processor_enable;
