@@ -13,9 +13,6 @@ library WORK;
 use WORK.MIPS_CONSTANT_PKG.ALL;
 
 entity forwarding_unit is
-    generic(
-        REG_ADDR_SIZE : integer := RADDR_BUS
-    );
     port(
         -- Requested
         rs_addr  : in STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
@@ -38,5 +35,29 @@ end forwarding_unit;
 architecture Behavioral of forwarding_unit is
 
 begin
-
+    RS : process (rs_addr, mem_addr, mem_write, wb_addr, wb_write)
+    begin
+        if rs_addr = (REG_ADDR_WIDTH-1 downto 0 => '0') then
+            forward_rs <= NO_FORWARD;
+        elsif rs_addr = mem_addr and mem_write = '1' then
+            forward_rs <= FORWARD_MEM;
+        elsif rs_addr = wb_addr and wb_write = '1' then
+            forward_rs <= FORWARD_WB;
+        else
+            forward_rs <= NO_FORWARD;
+        end if;
+    end process;
+    
+    RT : process (rt_addr, mem_addr, mem_write, wb_addr, wb_write)
+    begin
+        if rt_addr = (REG_ADDR_WIDTH-1 downto 0 => '0') then
+            forward_rt <= NO_FORWARD;
+        elsif rt_addr = mem_addr and mem_write = '1' then
+            forward_rt <= FORWARD_MEM;
+        elsif rt_addr = wb_addr and wb_write = '1' then
+            forward_rt <= FORWARD_WB;
+        else
+            forward_rt <= NO_FORWARD;
+        end if;
+    end process;
 end Behavioral;

@@ -672,7 +672,7 @@ begin
         forward_rt => ex_fwd_rt
     );
     
-    -- TODO : Forwarding
+    -- MUX : Forwarding
     ex_rs_fwd <= ex_rs when ex_fwd_rs = NO_FORWARD else mem_res_2 when ex_fwd_rs = FORWARD_MEM else wb_wb;
     ex_rt_fwd <= ex_rt when ex_fwd_rt = NO_FORWARD else mem_res_2 when ex_fwd_rt = FORWARD_MEM else wb_wb;
     
