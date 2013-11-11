@@ -14,13 +14,13 @@ def main():
         line = line.strip()
         code = line.split(' ')
         cmd = code[0]
+        if cmd == ';':
+            continue
         string = ''
         if vhdl:
             string = 'constant ins' + `lnum` + '\t: std_logic_vector(0 to 31) := "'
 
-        if cmd == ';':
-            pass
-        elif cmd == 'nop':
+        if cmd == 'nop':
             string += '00000000000000000000000000000000'
         elif cmd == 'add':
             # add
