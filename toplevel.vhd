@@ -158,9 +158,9 @@ begin
 	begin
 		if com_write_imem = '1' then
 			imem_write_enable_com <= com_write_en;
-			dmem_write_enable_com <= ZERO1b;
+			dmem_write_enable_com <= '0';
 		else
-			imem_write_enable_com <= ZERO1b;
+			imem_write_enable_com <= '0';
 			dmem_write_enable_com <= com_write_en;
 		end if;
 	end process;
