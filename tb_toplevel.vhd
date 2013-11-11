@@ -60,11 +60,11 @@ ARCHITECTURE behavior OF tb_toplevel IS
 	constant data2 : std_logic_vector(0 to 31):= "00000000000000000000000000001010";
   
   -- These are the instructions executed by the CPU (loaded to instruction-memory)
-  constant ins0  : std_logic_vector(0 to 31) := OP_LW  & "00000" & "00001" & "0000000000000001"; -- lw r1, 1(r0)
-  constant ins1  : std_logic_vector(0 to 31) := OP_LW  & "00000" & "00010" & "0000000000000010"; -- lw r2, 2(r0)
-  constant ins2  : std_logic_vector(0 to 31) := (others => '0'); -- nop
-  constant ins3  : std_logic_vector(0 to 31) := OP_RCODE & "00001" & "00010" & "00011" & "00000" & FUNC_ADD; -- add r3, r1, r2
-  constant ins4  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins0  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins1  : std_logic_vector(0 to 31) := OP_LW  & "00000" & "00001" & "0000000000000001"; -- lw r1, 1(r0)
+  constant ins2  : std_logic_vector(0 to 31) := OP_LW  & "00000" & "00010" & "0000000000000010"; -- lw r2, 2(r0)
+  constant ins3  : std_logic_vector(0 to 31) := (others => '0'); -- nop
+  constant ins4  : std_logic_vector(0 to 31) := OP_RCODE & "00001" & "00010" & "00011" & "00000" & FUNC_ADD; -- add r3, r1, r2
   constant ins5  : std_logic_vector(0 to 31) := (others => '0'); -- nop
   constant ins6  : std_logic_vector(0 to 31) := (others => '0'); -- nop
   constant ins7  : std_logic_vector(0 to 31) := (others => '0'); -- nop

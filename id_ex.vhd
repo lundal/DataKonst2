@@ -73,62 +73,64 @@ architecture Behavioral of id_ex is
 begin
     process(clk, reset, enable, alu_func_in, alu_src_in, shift_src_in, eq_in, slt_in, link_in, jump_in, branch_in, mem_write_in, reg_write_in, mem_to_reg_in, pc_in, rs_in, rt_in, imm_in, rsa_in, rta_in, rda_in, shift_in, target_in)
     begin
-        if reset = '1' then
-            -- EX
-            alu_func_out <= ALU_NA;
-            alu_src_out <= '0';
-            shift_src_out <= '0';
-            
-            -- MEM
-            eq_out <= '0';
-            slt_out <= '0';
-            link_out <= '0';
-            jump_out <= NO_JUMP;
-            branch_out <= '0';
-            mem_write_out <= '0';
-            
-            -- WB
-            reg_write_out <= '0';
-            mem_to_reg_out <= '0';
-            
-            -- Signals
-            pc_out <= (others => '0');
-            rs_out <= (others => '0');
-            rt_out <= (others => '0');
-            imm_out <= (others => '0');
-            rsa_out <= (others => '0');
-            rta_out <= (others => '0');
-            rda_out <= (others => '0');
-            shift_out <= (others => '0');
-            target_out <= (others => '0');
-        elsif rising_edge(clk) and enable = '1' then
-            -- EX
-            alu_func_out <= alu_func_in;
-            alu_src_out <= alu_src_in;
-            shift_src_out <= shift_src_in;
-            
-            -- MEM
-            eq_out <= eq_in;
-            slt_out <= slt_in;
-            link_out <= link_in;
-            jump_out <= jump_in;
-            branch_out <= branch_in;
-            mem_write_out <= mem_write_in;
-            
-            -- WB
-            reg_write_out <= reg_write_in;
-            mem_to_reg_out <= mem_to_reg_in;
-            
-            -- Signals
-            pc_out <= pc_in;
-            rs_out <= rs_in;
-            rt_out <= rt_in;
-            imm_out <= imm_in;
-            rsa_out <= rsa_in;
-            rta_out <= rta_in;
-            rda_out <= rda_in;
-            shift_out <= shift_in;
-            target_out <= target_in;
+        if rising_edge(clk) then
+            if reset = '1' then
+                -- EX
+                alu_func_out <= ALU_NA;
+                alu_src_out <= '0';
+                shift_src_out <= '0';
+                
+                -- MEM
+                eq_out <= '0';
+                slt_out <= '0';
+                link_out <= '0';
+                jump_out <= NO_JUMP;
+                branch_out <= '0';
+                mem_write_out <= '0';
+                
+                -- WB
+                reg_write_out <= '0';
+                mem_to_reg_out <= '0';
+                
+                -- Signals
+                pc_out <= (others => '0');
+                rs_out <= (others => '0');
+                rt_out <= (others => '0');
+                imm_out <= (others => '0');
+                rsa_out <= (others => '0');
+                rta_out <= (others => '0');
+                rda_out <= (others => '0');
+                shift_out <= (others => '0');
+                target_out <= (others => '0');
+            elsif enable = '1' then
+                -- EX
+                alu_func_out <= alu_func_in;
+                alu_src_out <= alu_src_in;
+                shift_src_out <= shift_src_in;
+                
+                -- MEM
+                eq_out <= eq_in;
+                slt_out <= slt_in;
+                link_out <= link_in;
+                jump_out <= jump_in;
+                branch_out <= branch_in;
+                mem_write_out <= mem_write_in;
+                
+                -- WB
+                reg_write_out <= reg_write_in;
+                mem_to_reg_out <= mem_to_reg_in;
+                
+                -- Signals
+                pc_out <= pc_in;
+                rs_out <= rs_in;
+                rt_out <= rt_in;
+                imm_out <= imm_in;
+                rsa_out <= rsa_in;
+                rta_out <= rta_in;
+                rda_out <= rda_in;
+                shift_out <= shift_in;
+                target_out <= target_in;
+            end if;
         end if;
     end process;
 end Behavioral;

@@ -284,7 +284,6 @@ architecture Behavioral of processor is
     signal if_pc        : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
     signal if_pc_1      : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
     signal if_pc_next   : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
-    signal if_pc_next_1 : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
     signal if_inst      : STD_LOGIC_VECTOR(INST_WIDTH-1 downto 0) := (others => '0');
     
     -- ID control signals
@@ -308,6 +307,8 @@ architecture Behavioral of processor is
     signal id_func   : STD_LOGIC_VECTOR(FUNC_WIDTH-1 downto 0) := (others => '0');
     signal id_rs     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
     signal id_rt     : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal id_rs_reg : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
+    signal id_rt_reg : STD_LOGIC_VECTOR(REG_WIDTH-1 downto 0) := (others => '0');
     signal id_rsa    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal id_rta    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
     signal id_rda    : STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0) := (others => '0');
@@ -401,6 +402,7 @@ architecture Behavioral of processor is
     signal reset_mem_wb : STD_LOGIC := '0';
     
     -- Other signals
+    signal flush : STD_LOGIC := '0';
     signal pipeline_enable : STD_LOGIC := '0';
     
 begin
@@ -545,18 +547,6 @@ begin
     -- INSTRUCTION FETCH --
     -----------------------
     
-    REG_PC : pc
-    port map(
-        -- Signals
-        pc_in  => if_pc_next_1,
-        pc_out => if_pc,
-        
-        -- Pipeline signals
-        clk    => clk,
-        reset  => reset,
-        enable => pipeline_enable
-    );
-	
     IF_PC_INC : Adder
     generic map(
         N => PC_WIDTH
@@ -576,10 +566,10 @@ begin
     if_eq <= mem_zero when mem_eq = '1' else not mem_zero;
     
     -- MUX : Branch
-    if_pc_next <= mem_branch_addr when (mem_branch and if_eq) = '1' else if_pc_1;
+    if_pc_next <= mem_branch_addr when (mem_branch and if_eq) = '1' else id_pc;
     
     -- MUX : Jump
-    if_pc_next_1 <= if_pc_next when mem_jump = NO_JUMP else mem_jump_addr when mem_jump = JUMP else mem_jump_reg_addr;
+    if_pc <= if_pc_next when mem_jump = NO_JUMP else mem_jump_addr when mem_jump = JUMP else mem_jump_reg_addr;
     
     ------------------------
     -- INSTRUCTION DECODE --
@@ -632,10 +622,28 @@ begin
         RT_ADDR    => id_rta,
         RD_ADDR    => wb_rda,
         WRITE_DATA => wb_wb,
-        RS         => id_rs,
-        RT         => id_rt
+        RS         => id_rs_reg,
+        RT         => id_rt_reg
     );
     
+    FORWARD_RS : process(wb_reg_write, wb_rda, id_rsa, wb_rda, wb_wb, id_rs_reg)
+    begin
+        if wb_reg_write = '1' and wb_rda = id_rsa and wb_rda /= (REG_ADDR_WIDTH-1 downto 0 => '0') then
+            id_rs <= wb_wb;
+        else
+            id_rs <= id_rs_reg;
+        end if;
+    end process;
+    
+    FORWARD_RT : process(wb_reg_write, wb_rda, id_rta, wb_rda, wb_wb, id_rt_reg)
+    begin
+        if wb_reg_write = '1' and wb_rda = id_rta and wb_rda /= (REG_ADDR_WIDTH-1 downto 0 => '0') then
+            id_rt <= wb_wb;
+        else
+            id_rt <= id_rt_reg;
+        end if;
+    end process;
+
     -- Sign Extender
     id_imm_x <= ZERO16 & id_imm when id_imm(16-1) = '0' else ONE16 & id_imm;
     
@@ -750,9 +758,12 @@ begin
     
     -- Reset signals
     reset_if_id <= reset;
-    reset_id_ex <= reset;
-    reset_ex_mem <= reset;
+    reset_id_ex <= reset or flush;
+    reset_ex_mem <= reset or flush;
     reset_mem_wb <= reset;
+    
+    -- Flush signal
+    flush <= '1' when mem_jump /= NO_JUMP else '0';
     
 	-- Enable pipeline (TODO : Only for stalling)
 	pipeline_enable <= processor_enable;
