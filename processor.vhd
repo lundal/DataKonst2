@@ -673,8 +673,8 @@ begin
     );
     
     -- TODO : Forwarding
-    ex_rs_fwd <= ex_rs;
-    ex_rt_fwd <= ex_rt;
+    ex_rs_fwd <= ex_rs when ex_fwd_rs = NO_FORWARD else mem_res_2 when ex_fwd_rs = FORWARD_MEM else wb_wb;
+    ex_rt_fwd <= ex_rt when ex_fwd_rt = NO_FORWARD else mem_res_2 when ex_fwd_rt = FORWARD_MEM else wb_wb;
     
     -- MUX: Shift Source
     ex_alu_s <= ex_shift when ex_shift_src = '0' else ex_rs_fwd(SHIFT_WIDTH+FUNC_WIDTH-1 downto FUNC_WIDTH);
