@@ -502,9 +502,9 @@ begin
         -- Signals
         pc_in    => ex_pc,
         pc_out   => mem_pc,
-        rs_in    => ex_rs,
+        rs_in    => ex_rs_fwd,
         rs_out   => mem_rs,
-        rt_in    => ex_rt,
+        rt_in    => ex_rt_fwd,
         rt_out   => mem_rt,
         imm_in   => ex_imm,
         imm_out  => mem_imm,
@@ -762,8 +762,8 @@ begin
     reset_ex_mem <= reset or flush;
     reset_mem_wb <= reset;
     
-    -- Flush signal
-    flush <= '1' when mem_jump /= NO_JUMP else '0';
+    -- Flush pipeline when jumping or branching
+    flush <= '1' when mem_jump /= NO_JUMP or (mem_branch and if_eq) = '1' else '0';
     
 	-- Enable pipeline (TODO : Only for stalling)
 	pipeline_enable <= processor_enable;

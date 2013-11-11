@@ -61,23 +61,23 @@ ARCHITECTURE behavior OF tb_toplevel IS
     constant data3 : std_logic_vector(0 to 31):= "00000000000000000000000000101010";
 
     -- These are the instructions executed by the CPU (loaded to instruction-memory)
-    constant ins0	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
-    constant ins1	: std_logic_vector(0 to 31) := "10001100000000010000000000000001";
-    constant ins2	: std_logic_vector(0 to 31) := "10001100000000100000000000000010";
-    constant ins3	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
-    constant ins4	: std_logic_vector(0 to 31) := "00000000001000100010000000100000";
-    constant ins5	: std_logic_vector(0 to 31) := "00000000001000100010100000100000";
-    constant ins6	: std_logic_vector(0 to 31) := "00000000001000100011000000100000";
-    constant ins7	: std_logic_vector(0 to 31) := "00001000000000000000000000001010";
-    constant ins8	: std_logic_vector(0 to 31) := "00000000001000100011100000100000";
-    constant ins9	: std_logic_vector(0 to 31) := "00000000001000100100000000100000";
-    constant ins10	: std_logic_vector(0 to 31) := "00000000001000100100100000100000";
-    constant ins11	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
-    constant ins12	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
-    constant ins13	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
-    constant ins14	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
-    constant ins15	: std_logic_vector(0 to 31) := "00001000000000000000000000001011";
-    
+constant ins0	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+constant ins1	: std_logic_vector(0 to 31) := "10001100000000010000000000000001";
+constant ins2	: std_logic_vector(0 to 31) := "10001100000000100000000000000010";
+constant ins3	: std_logic_vector(0 to 31) := "10001100000000110000000000000011";
+constant ins4	: std_logic_vector(0 to 31) := "00000000010000010001000000100010";
+constant ins5	: std_logic_vector(0 to 31) := "00100000100001000000000000000001";
+constant ins6	: std_logic_vector(0 to 31) := "00010100000000101111111111111101";
+constant ins7	: std_logic_vector(0 to 31) := "00100000000001010010001100101001";
+constant ins8	: std_logic_vector(0 to 31) := "10101100000001010000000000001000";
+constant ins9	: std_logic_vector(0 to 31) := "10001100000001100000000000001000";
+constant ins10	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+constant ins11	: std_logic_vector(0 to 31) := "00010000110001010000000000000001";
+constant ins12	: std_logic_vector(0 to 31) := "00100000000001110000000000000111";
+constant ins13	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+constant ins14	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
+constant ins15	: std_logic_vector(0 to 31) := "00001000000000000000000000001101";
+
     -- Used to control the COM-module
     constant CMD_IDLE	: std_logic_vector(0 to 31) := "00000000000000000000000000000000";
     constant CMD_WI	  : std_logic_vector(0 to 31) := "00000000000000000000000000000001";
