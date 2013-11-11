@@ -6,7 +6,6 @@
 -- Description: 
 -- A simple forwarding unit
 ----------------------------------------------------------------------------------
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -17,20 +16,22 @@ entity forwarding_unit is
     generic(
         REG_ADDR_SIZE : integer := RADDR_BUS
     );
-    port( 
-        -- Execute signals
-        rs_addr : in STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
-        rt_addr : in STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+    port(
+        -- Requested
+        rs_addr  : in STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
+        rt_addr  : in STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
         
-        -- Later signals
-        mem_write : in STD_LOGIC_VECTOR;
-        mem_addr  : in STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
-        wb_write  : in STD_LOGIC_VECTOR;
-        wb_addr   : in STD_LOGIC_VECTOR(REG_ADDR_SIZE-1 downto 0);
+        -- From mem
+        mem_addr  : in STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
+        mem_write : in STD_LOGIC;
         
-        -- Forwarding signals
-        rs_forward : out STD_LOGIC_VECTOR(2-1 downto 0);
-        rt_forward : out STD_LOGIC_VECTOR(2-1 downto 0)
+        -- From wb
+        wb_addr  : in STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
+        wb_write : in STD_LOGIC;
+        
+        -- Forwarding
+        forward_rs : out FORWARD_TYPE;
+        forward_rt : out FORWARD_TYPE
     );
 end forwarding_unit;
 

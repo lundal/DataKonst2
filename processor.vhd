@@ -172,7 +172,6 @@ architecture Behavioral of processor is
     component register_file is
         port(
             CLK        : in  STD_LOGIC;
-            RESET      : in  STD_LOGIC;
             RW         : in  STD_LOGIC;
             RS_ADDR    : in  STD_LOGIC_VECTOR(RADDR_BUS-1 downto 0);
             RT_ADDR    : in  STD_LOGIC_VECTOR(RADDR_BUS-1 downto 0);
@@ -247,11 +246,46 @@ architecture Behavioral of processor is
         );
     end component;
     
+    component forwarding_unit is
+        port(
+            -- Requested
+            rs_addr  : in STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
+            rt_addr  : in STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
+            
+            -- From mem
+            mem_addr  : in STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
+            mem_write : in STD_LOGIC;
+            
+            -- From wb
+            wb_addr  : in STD_LOGIC_VECTOR(REG_ADDR_WIDTH-1 downto 0);
+            wb_write : in STD_LOGIC;
+            
+            -- Forwarding
+            forward_rs : out FORWARD_TYPE;
+            forward_rt : out FORWARD_TYPE
+        );
+    end component;
+    
+    component pc is
+        port( 
+            -- Signals
+            pc_in    : in  STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
+            pc_out   : out STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
+            
+            -- Pipeline signals
+            clk      : in  STD_LOGIC;
+            reset    : in  STD_LOGIC;
+            enable   : in  STD_LOGIC
+        );
+    end component;
+    
     -- IF signals
-    signal if_pc      : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal if_pc_1    : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal if_pc_next : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-    signal if_inst    : STD_LOGIC_VECTOR(INST_WIDTH-1 downto 0);
+    signal if_eq        : STD_LOGIC;
+    signal if_pc        : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
+    signal if_pc_1      : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
+    signal if_pc_next   : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
+    signal if_pc_next_1 : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
+    signal if_inst      : STD_LOGIC_VECTOR(INST_WIDTH-1 downto 0);
     
     -- ID control signals
     signal id_reg_dst    : STD_LOGIC;
@@ -418,7 +452,7 @@ begin
         rsa_out => ex_rsa,
         rta_in  => id_rta,
         rta_out => ex_rta,
-        rda_in  => id_rda,
+        rda_in  => id_wba,
         rda_out => ex_rda,
         shift_in  => id_shift,
         shift_out => ex_shift,
@@ -488,7 +522,7 @@ begin
         mem_out => wb_mem,
         res_in  => mem_res_2,
         res_out => wb_res,
-        rda_in  => mem_rda,
+        rda_in  => mem_wba,
         rda_out => wb_rda,
         
         -- Pipeline signals
@@ -501,14 +535,17 @@ begin
     -- INSTRUCTION FETCH --
     -----------------------
     
-    REG_PC : process(clk, reset, pipeline_enable, if_pc_next)
-    begin
-        if reset = '1' then
-            if_pc <= (others => '0');
-        elsif rising_edge(clk) and pipeline_enable = '1' then
-            if_pc <= if_pc_next;
-        end if;
-    end process;
+    REG_PC : pc
+    port map(
+        -- Signals
+        pc_in  => if_pc_next_1,
+        pc_out => if_pc,
+        
+        -- Pipeline signals
+        clk    => clk,
+        reset  => reset,
+        enable => pipeline_enable
+    );
 	
     IF_PC_INC : Adder
     generic map(
@@ -524,6 +561,15 @@ begin
     -- Instruction Memory
     imem_address <= if_pc;
     if_inst <= imem_data_in;
+    
+    -- MUX : EQ
+    if_eq <= mem_zero when mem_eq = '1' else not mem_zero;
+    
+    -- MUX : Branch
+    if_pc_next <= mem_branch_addr when (mem_branch and if_eq) = '1' else if_pc_1;
+    
+    -- MUX : Jump
+    if_pc_next_1 <= if_pc_next when mem_jump = NO_JUMP else mem_jump_addr when mem_jump = JUMP else mem_jump_reg_addr;
     
     ------------------------
     -- INSTRUCTION DECODE --
@@ -547,12 +593,19 @@ begin
         opcode => id_opcode,
         func   => id_func,
         
+        -- ID Control signals
+        reg_dst => id_reg_dst,
+        
         -- EX control signals
-        reg_dst  => id_reg_dst,
-        alu_func => id_alu_func,
-        alu_src  => id_alu_src,
+        alu_func  => id_alu_func,
+        alu_src   => id_alu_src,
+        shift_src => id_shift_src,
         
         -- MEM control signals
+        eq        => id_eq,
+        slt       => id_slt,
+        link      => id_link,
+        jump      => id_jump,
         branch    => id_branch,
         mem_write => id_mem_write,
         
@@ -564,7 +617,6 @@ begin
     ID_REGS : register_file
     port map(
         CLK        => clk,
-        RESET      => reset,
         RW         => wb_reg_write,
         RS_ADDR    => id_rsa,
         RT_ADDR    => id_rta,
@@ -573,6 +625,12 @@ begin
         RS         => id_rs,
         RT         => id_rt
     );
+    
+    -- Sign Extender
+    id_imm_x <= ZERO16 & id_imm when id_imm(16-1) = '0' else ONE16 & id_imm;
+    
+    -- MUX: Destination Register
+    id_wba <= id_rda when id_reg_dst = '0' else id_rta;
     
     -------------
     -- EXECUTE --
@@ -591,7 +649,26 @@ begin
         FUNC  => ex_alu_func
     );
     
-    -- TODO forwarding
+    FORWARD : forwarding_unit
+    port map(
+        -- Requested
+        rs_addr => ex_rsa,
+        rt_addr => ex_rta,
+        
+        -- From mem
+        mem_addr  => mem_wba,
+        mem_write => mem_reg_write
+        
+        -- From wb
+        wb_addr  => wb_wba,
+        wb_write => wb_reg_write,
+        
+        -- Forwarding
+        forward_rs => ex_fwd_rs,
+        forward_rt => ex_fwd_rt
+    );
+    
+    -- TODO : Forwarding
     ex_rs_fwd <= ex_rs;
     ex_rt_fwd <= ex_rt;
     
@@ -599,7 +676,10 @@ begin
     ex_alu_s <= ex_shift when ex_shift_src = '0' else ex_rs_fwd(SHIFT_WIDTH+FUNC_WIDTH-1 downto FUNC_WIDTH);
     
     -- MUX: ALU Source
-    ex_alu_y <= ex_rt when ex_alu_src = '0' else ex_imm;
+    ex_alu_y <= ex_rt_fwd when ex_alu_src = '0' else ex_imm;
+    
+    -- Other mapping
+    ex_alu_x <= ex_rs_fwd;
     
     ------------
     -- MEMORY --
@@ -623,6 +703,17 @@ begin
         Neg  => mem_neg
     );
     
+    MEM_BRANCH_ADDER : Adder
+    generic map(
+        N => PC_WIDTH
+    )
+    port map(
+        A        => mem_pc,
+        B        => mem_imm,
+        R        => mem_branch_addr,
+        CARRY_IN => '0'
+    );
+    
     -- MUX : SLT
     mem_res_1 <= (REG_WIDTH-1 downto 1 => '0') & mem_neg when mem_slt = '1' else mem_res;
     
@@ -632,20 +723,20 @@ begin
     -- MUX : Link Address
     mem_wba <= (others => '1') when mem_link = '1' else mem_rda;
     
-    ------------
-    -- RANDOM --
-    ------------
+    -- Jump addresses
+    mem_jump_reg_addr <= mem_rs;
+    mem_jump_addr <= mem_pc(INST_WIDTH-1 downto TARGET_WIDTH) & mem_target;
     
-    -- Sign Extender
-    id_imm_x <= ZERO16 & id_imm when id_imm(16-1) = '0' else ONE16 & id_imm;
+    ----------------
+    -- WRITE BACK --
+    ----------------
     
-    -- MUX: Destination Register
-    id_wba <= id_rta when id_reg_dst = '0' else id_rda;
-    
-    
-
     -- MUX: Memory To Registry
     wb_wb <= wb_res when wb_mem_to_reg = '0' else wb_mem;
+    
+    -----------
+    -- OTHER --
+    -----------
     
 	-- Enable pipeline (TODO : Only for stalling)
 	pipeline_enable <= processor_enable;

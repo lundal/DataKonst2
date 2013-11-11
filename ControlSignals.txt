@@ -48,7 +48,7 @@ sll 000000
 srl 000010
 sra 000011
 
-TODO:
+Mapping:
     IF
 x        PC
 x        Add
@@ -57,9 +57,9 @@ x        Add
         Branch-ish
     ID
 x        Decoder
-        Control Unit
-        Regs
-        Sign_Extend
+x        Control Unit
+x        Regs
+x        Sign_Extend
     EX
         FORWARD_S
         FORWARD_T
@@ -68,11 +68,11 @@ x        ALU_SRC
 x        ALU
         Forward Unit
     MEM
-        Add
-        Conc
-        SLT
-        Link_Res
-        ZeroTester
-        Link_Addr
+x        Add
+x        Conc
+x        SLT
+x        Link_Res
+x        ZeroTester
+x        Link_Addr
     WB
-        MemToReg
+x        MemToReg

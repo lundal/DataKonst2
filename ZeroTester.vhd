@@ -36,8 +36,8 @@ end ZeroTester;
 architecture Behavioral of ZeroTester is
 	
 begin
-	Pos		<= '1' when not (I = ZERO64) and I(N-1) = '0' else '0';
-	Zero	<= '1' when I = ZERO64 else '0';
+	Pos		<= '1' when not (I = (N-1 downto 0 => '0')) and I(N-1) = '0' else '0';
+	Zero	<= '1' when I = (N-1 downto 0 => '0') else '0';
 	Neg		<= '1' when I(N-1) = '1' else '0';
 end Behavioral;
 
