@@ -27,9 +27,10 @@ Thus, to avoid reading invalid data, the instructions has to be reordered or a n
 
 \subsection{Instruction Set}
 
-The instruction set is a reduced MIPS instruction set, supporting some
-arithmetic and logics, both register bound and the immediate form, as well as
-shifting, jumping, branching and load and store, totaling 29.
+The supported instruction set is a reduced version of the MIPS instruction set found in the compendium \cite[p.112]{lab-compendium},
+supporting some arithmetic and logics,
+both register bound and the immediate form,
+as well as shifting, jumping, branching and load and store, totaling 29.
 
 \subsubsection*{Control Unit}
 
@@ -79,6 +80,8 @@ Note that there is no separate ALU control unit.
     \label{table:ctrlsignals}
 \end{table}
 
+\subsubsection*{ALU}
+\todo{alu}
 
 \subsection{Optimizations}
 \subsubsection*{Forwarding Unit}

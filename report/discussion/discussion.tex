@@ -1,9 +1,17 @@
+\subsection{Workflow}
+
+We started by implementing the suggested architecture, but soon noticed that the architecture could be reasonably straightforward expanded to support a much larger set of instructions.
+This led us to creating the new architecture schematic and determining the required control signals, before rewriting the previously written vhdl to reflect the changes.
+Having gained a lot of experience with VHDL during the first exercise and the TDT4295 Computer Project, in addition to having a precise schematic and no state machines in the design, we did barely any testing until the whole thing was assembled.
+This turned out to work pretty good and there were no major issues.
+
 \subsection{Warnings}
 
 There are quite a few warnings that pop up during syntezation of the project, but they are not the result of errors or mistakes in the processor implementation.
 All come from the supplied framework, and most complain about memory address lines that are not connected, as the framework uses block ram which takes only 8-bit addresses.
 
 \subsection{Assembler}
+
 Since the programs that would be run on the processor should be in machine code,
 it is not easy to write them. For that reason, an assembler was written. It is a
 completely naive implementation, and does not give anything extra to the
@@ -17,14 +25,13 @@ pseudoinstruction.
 \subsection{Further optimization}
 
 \subsubsection*{Branch prediction}
+
 The implementated of branch prediction is fairly simple. To further improve the
 performance of the processor, more sofisticated branch predictions should be
 used.
 
-For example, it could assume that backwards pointing branches would be taken,
-while forward pointing ones will not. Other implementation could be to use a
-state to give the prediction some memory, and then easier avoid to miss the
-prediction twice in a loop.\cite{wiki-branching}
+The simplest would propably be a 2-bit local branch predictor, which changes its prediction whenever two predictions are wrong.
+More advanced predictors might store store a few bits for each instruction and use the principle on a per-instruction basis, or use a combination of both.\cite{wiki-branching}
 
 \subsection{NOP}
 
