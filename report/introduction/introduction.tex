@@ -21,14 +21,15 @@ one in each stage, as seen below in figure \ref{fig:pipeline}.
 \end{figure}
 
 \subsubsection*{Hazards}
-But pipelining is not only good, as it can cause problems when the instructions
-needs to perform the same action at different times, or some data is dependent
-on an earlier instruction. This can always be solved by stalling the processor, 
-but it can't be done while running. To stop this, the processor must do so called 
-hazard detection. When it finds that a problem will arise, it adds 'stall 
-instructions', or pipeline bubbles, that basically tells the processor to stall 
-for that cycle. In other words, it inserts a NOP instruction into the
-pipeline.\cite{hazards-lecture}
+However, pipelining is not that simple. Problems can occur when one instruction
+is dependent on the result from a previous instruction which has not yet fully completed.
+This can be solved by inserting stall instructions called nops when there are dependencies,
+but this reduces performance. Another solution is to perform instruction reordering
+but that leaves extra work for the programmer.
+However, this issue can be circumvented by sending the results from previous, not
+yet completed stages to following stages.
+This is called forwarding, and will prevent the need for nops in almost all cases.
+\cite{hazards-lecture}
 
 \subsection{Optimization}
 
