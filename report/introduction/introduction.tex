@@ -1,12 +1,52 @@
 \subsection{Pipelining}
 
-Pipelined vs multi-cycle
+Pipelining is a technique to increase the throughput of the processor. Multiple
+steps in the processor can be performed at the same time. 
 
-Pipeline bubbles
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.7]{figures/pipeline.png}
+    \caption{\label{fig:pipeline}An example of pipeline during execution} 
+\end{figure}
+
+Pipelined design is especialy good when the processor is multi-cycle, as the
+instructions are divided into smaller parts. In other words, pipelining is a way
+of making a multi-cycle processor even faster. 
+
+\subsubsection*{Hazards}
+But pipelining is not only good, as it can cause problems when the instructions
+needs to perform the same action at different times, or some data is dependent
+on an earlier instruction. This can always be solved by stalling the processor, 
+but it can't be done while running. To stop this, the processor must do so called 
+hazard detection. When it finds that a problem will arise, it adds 'stall 
+instructions', or pipeline bubbles, that basically tells the processor to stall 
+for that cycle. In other words, it inserts a NOP instruction into the pipeline.
 
 \subsection{Optimization}
 
-Forwarding
+\subsubsection*{Forwarding}
+Instead of inserting pipeline bubbles, forwarding can be implemented. To forward
+is to send the result of an instruction back in the pipeline to an earlier
+dependent step. A trivial example of this can be
 
-Branch prediction
+\begin{verbatim}
+a = 1 + 1
+b = a + 1
+\end{verbatim}
 
+as \textit{b} is dependent on \textit{a}, and that instruction needs to be done.
+By sending \textit{a} back, the second instruction can be completed in time.
+
+
+\subsubsection*{Branch prediction}
+In the case of branching, the processor can't add the next instruction to the
+pipeline, as it isn't sure of what instruction is the next. To solve this
+problem, branch prediction tries to guess whether or not a branch will be
+followed. This allows to then find the next instruction, and thus add the next
+instruction to the pipeline.
+
+
+\subsubsection*{Flushing}
+If a branch is taken, but was assumed not, the instruction in the pipeline must
+be discarded. This is called flushing, and is done by inserting NOP instructions
+instead of instructions that should be executed.
