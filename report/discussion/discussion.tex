@@ -6,3 +6,12 @@
 
 \subsection{NOP}
 
+Since the processor has no direct ability to halt the output from the memory blocks, a side effect of sending the output from the instruction memory directly through the first pipeline register is that the processor can only be reliably stopped on nops.
+If not, the first instruction will be sent through the pipeline twice.
+
+There are a couple solutions for this.
+The first is to rewrite the supplied framework to allow the processor to halt the memory output, which creates a great deal of extra work and might cause bugs in other parts of the framework.
+The second is to reset the program counter and flush the pipeline when the processor is stopped, which means that the program can not be resumed.
+
+Since each solution has its own side effects, we decided to simply start all programs with a nop instruction.
+
