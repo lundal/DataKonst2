@@ -84,8 +84,14 @@ Note that there is no separate ALU control unit.
 \subsubsection*{Forwarding Unit}
 \todo{forwarding unit}
 
+Forward from mem and wb stages to both rs and rt
+
+No forward from inst mem due to delayed read
+
 \subsubsection*{Branch Prediction}
 \todo{branch prediction}
+
+Assume not taken
 
 \subsection{Assembler}
 An assembler was written in python to easily write more test programs. It
