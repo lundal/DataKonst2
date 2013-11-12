@@ -1,17 +1,24 @@
 \subsection{Pipelining}
 
-Pipelining is a technique to increase the throughput of the processor. Multiple
-steps in the processor can be performed at the same time. 
+Multi-cycle processors are an improvement over single-cycles processors, but they still spend a great amount of time only doing one thing.
+Pipelining is a technique that dramaticly increases the throughput of a multi-cycle processor by allowing different stages of different instructions to execute at the same time.
+
+The execution of an instruction is usually split into five stages:
+Fetch, Decode, Execute, Memory and Writeback. 
+This means that 5 different instructions can be executed in parallell,
+one in each stage, as seen below in figure \ref{fig:pipeline}.
+\footnote{
+    The number of stages can vary.
+    Some versions of Intel Pentium 4 had a whopping 31-stage pipeline.
+    \cite{wiki-pentium4}
+}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.7]{figures/pipeline.png}
-    \caption{\label{fig:pipeline}An example of pipeline during execution} 
+    \includegraphics[width=\textwidth]{figures/pipeline2.png}
+    \caption{A pipeline during execution} 
+    \label{fig:pipeline}
 \end{figure}
-
-Pipelined design is especialy good when the processor is multi-cycle, as the
-instructions are divided into smaller parts. In other words, pipelining is a way
-of making a multi-cycle processor even faster. 
 
 \subsubsection*{Hazards}
 But pipelining is not only good, as it can cause problems when the instructions
