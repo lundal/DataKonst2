@@ -36,8 +36,7 @@ shifting, jumping, branching and load and store, totaling 29.
 Since the control signals are propagated to their proper stages through the pipeline, the control unit does not need a state machine like in multi-cycle processors.
 It simply needs to look at the opcode and function to and then output the correct signals for that instruction.
 All instructions and their control signal mappings can be seen below in table \ref{table:ctrlsignals}.
-
-ALU control
+Note that there is no separate ALU control unit.
 
 \begin{table}[ht]
     \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
