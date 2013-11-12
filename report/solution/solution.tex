@@ -82,19 +82,24 @@ Note that there is no separate ALU control unit.
 
 \subsection{Optimizations}
 \subsubsection*{Forwarding Unit}
-\todo{forwarding unit}
+The forward unit checks if the address in is equal to the memory
+address or write back address, and that the write for either the memory or write
+back is high. When \textit{FORWARD\_MEM} or \textit{FORWARD\_WB} is set, the
+MUXes before the ALU, the signal to the ALU is set to the one that was
+forwarded. 
 
-Forward from mem and wb stages to both rs and rt
-
-No forward from inst mem due to delayed read
+In addition, because the registers are read first, and to get the right adress
+on the bus, the forwarding unit sends to the register file as well. However
+there is no forward from instruction memory, due to delayed read.
 
 \subsubsection*{Branch Prediction}
-\todo{branch prediction}
-
-Assume not taken
+The branch prediction implemented is assume not taken, that is whenever there is a
+branch, the processor will add the instruction after to the pipeline as there
+was no jump. 
 
 \subsection{Assembler}
 An assembler was written in python to easily write more test programs. It
 assumes the programmer knows what she is doing, and will not give nice error
 messages. When given the flag '-x', the assembler writes the instructions on
 hexadecimal form, to easily run the programs on the computer.
+
