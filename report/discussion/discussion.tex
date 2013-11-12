@@ -4,8 +4,27 @@ There are quite a few warnings that pop up during syntezation of the project, bu
 All come from the supplied framework, and most complain about memory address lines that are not connected, as the framework uses block ram which takes only 8-bit addresses.
 
 \subsection{Assembler}
+Since the programs that would be run on the processor should be in machine code,
+it is not easy to write them. For that reason, an assembler was written. It is a
+completely naive implementation, and does not give anything extra to the
+programmer. 
+
+If the processor would be used in real life, it could be wise to add convenient
+instructions and things like labels. Some instructions not implemented in the
+hardware, such as multiplication, could also be implemented as a
+pseudoinstruction.
 
 \subsection{Further optimization}
+
+\subsubsection*{Branch prediction}
+The implementated of branch prediction is fairly simple. To further improve the
+performance of the processor, more sofisticated branch predictions should be
+used.
+
+For example, it could assume that backwards pointing branches would be taken,
+while forward pointing ones will not. Other implementation could be to use a
+state to give the prediction some memory, and then easier avoid to miss the
+prediction twice in a loop.
 
 \subsection{NOP}
 
@@ -16,5 +35,6 @@ There are a couple solutions for this.
 The first is to rewrite the supplied framework to allow the processor to halt the memory output, which creates a great deal of extra work and might cause bugs in other parts of the framework.
 The second is to reset the program counter and flush the pipeline when the processor is stopped, which means that the program can not be resumed.
 
-Since each solution has its own side effects, we decided to simply start all programs with a nop instruction.
+Since each solution has its own side effects, we decided to simply start all
+programs with a NOP instruction.
 
