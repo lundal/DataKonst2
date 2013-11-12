@@ -26,6 +26,48 @@ Thus, to avoid reading invalid data, the instructions has to be reordered or a n
 
 \subsection{Control Unit}
 
+\begin{table}[ht]
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        Instruction & B & EQ & J & L & SLT & RegDst & ShSrc & AluSrc & AluFun & MTR & RegW & MemW \\
+        \hline
+        add/addu   & 0 & X & 0 & 0 & 0 & 0 & X & 0 & Add & 0 & 1 & 0 \\
+        sub        & 0 & X & 0 & 0 & 0 & 0 & X & 0 & Sub & 0 & 1 & 0 \\
+        addi/addiu & 0 & X & 0 & 0 & 0 & 1 & X & 1 & Add & 0 & 1 & 0 \\
+        \hline
+        and        & 0 & X & 0 & 0 & 0 & 0 & X & 0 & And & 0 & 1 & 0 \\
+        or         & 0 & X & 0 & 0 & 0 & 0 & X & 0 & Or  & 0 & 1 & 0 \\
+        xor        & 0 & X & 0 & 0 & 0 & 0 & X & 0 & Xor & 0 & 1 & 0 \\
+        nor        & 0 & X & 0 & 0 & 0 & 0 & X & 0 & Nor & 0 & 1 & 0 \\
+        \hline
+        sll        & 0 & X & 0 & 0 & 0 & 0 & 0 & 0 & SLL & 0 & 1 & 0 \\
+        srl        & 0 & X & 0 & 0 & 0 & 0 & 0 & 0 & SRL & 0 & 1 & 0 \\
+        sra        & 0 & X & 0 & 0 & 0 & 0 & 0 & 0 & SRA & 0 & 1 & 0 \\
+        sllv       & 0 & X & 0 & 0 & 0 & 0 & 1 & 0 & SLL & 0 & 1 & 0 \\
+        srlv       & 0 & X & 0 & 0 & 0 & 0 & 1 & 0 & SRL & 0 & 1 & 0 \\
+        srav       & 0 & X & 0 & 0 & 0 & 0 & 1 & 0 & SRA & 0 & 1 & 0 \\
+        \hline
+        slt        & 0 & X & 0 & 0 & 1 & 0 & X & 0 & Sub & 0 & 1 & 0 \\
+        slti       & 0 & X & 0 & 0 & 1 & 1 & X & 1 & Sub & 0 & 1 & 0 \\
+        \hline
+        j          & X & X & 1 & X & X & X & X & X & X   & X & 0 & 0 \\
+        jal        & X & X & 1 & 1 & X & X & X & X & X   & X & 1 & 0 \\
+        jr         & X & X & 2 & X & X & X & X & X & X   & X & 0 & 0 \\
+        jral       & X & X & 2 & 1 & X & X & X & X & X   & X & 1 & 0 \\
+        \hline
+        beq        & 1 & 1 & 0 & X & X & X & X & 0 & Sub & X & 0 & 0 \\
+        bne        & 1 & 0 & 0 & X & X & X & X & 0 & Sub & X & 0 & 0 \\
+        \hline
+        lui        & 0 & X & 0 & 0 & 0 & 1 & X & 1 & LUI & 0 & 1 & 0 \\
+        lw         & 0 & X & 0 & 0 & 0 & 1 & X & 1 & Add & 1 & 1 & 0 \\
+        sw         & 0 & X & 0 & 0 & X & X & X & 1 & Add & X & 0 & 1 \\
+        \hline
+    \end{tabular}
+    \caption{Control signals for implemented instructions. Short notation due to space constraints: $ $ B = Branch, J = Jump, L = Link, MTR = MemToReg, RegW = RegWrite, MemW = MemWrite.}
+    \label{table:ctrlsignals}
+\end{table}
+
+
 \subsection{Forwarding Unit}
 
 \subsection{Branch Prediction}
