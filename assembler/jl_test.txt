@@ -1,0 +1,10 @@
+; r1 = 0xdeadbeef = 0b11011110101011011011111011101111
+nop
+jal 4
+nop
+j 2
+
+addi r1 r0 57005
+sll r1 r1 16
+addi r1 r1 48879
+jr r31
