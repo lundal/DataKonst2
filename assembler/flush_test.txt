@@ -6,13 +6,13 @@ nop
 lw r1 1 r0
 lw r2 2 r0
 nop
-add r4 r1 r2
-add r5 r1 r2
-add r6 r1 r2
+sw r2 16 r0
+sw r2 17 r0
+sw r2 18 r0
 j 10
-add r7 r1 r2
-add r8 r1 r2
-add r9 r1 r2 ; Addr 10
+sw r1 19 r0
+sw r1 20 r0
+sw r1 21 r0 ; Addr 10
 nop
 nop
 nop

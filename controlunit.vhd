@@ -179,6 +179,7 @@ begin
                 alu_func <= ALU_SUB;
                 alu_src <= '1';
                 reg_write <= '1';
+                reg_dst <= '1';
 			when OP_LUI => 
                 alu_func <= ALU_LUI;
                 reg_write <= '1';
