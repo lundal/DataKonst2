@@ -266,19 +266,6 @@ architecture Behavioral of processor is
         );
     end component;
     
-    component pc is
-        port( 
-            -- Signals
-            pc_in    : in  STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-            pc_out   : out STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0);
-            
-            -- Pipeline signals
-            clk      : in  STD_LOGIC;
-            reset    : in  STD_LOGIC;
-            enable   : in  STD_LOGIC
-        );
-    end component;
-    
     -- IF signals
     signal if_eq        : STD_LOGIC := '0';
     signal if_pc        : STD_LOGIC_VECTOR(PC_WIDTH-1 downto 0) := (others => '0');
