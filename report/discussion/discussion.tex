@@ -30,10 +30,8 @@ The implementated of branch prediction is fairly simple. To further improve the
 performance of the processor, more sofisticated branch predictions should be
 used.
 
-For example, it could assume that backwards pointing branches would be taken,
-while forward pointing ones will not. Other implementation could be to use a
-state to give the prediction some memory, and then easier avoid to miss the
-prediction twice in a loop.
+The simplest would propably be a 2-bit local branch predictor, which changes its prediction whenever two predictions are wrong.
+More advanced predictors might store store a few bits for each instruction and use the principle on a per-instruction basis, or use a combination of both.
 
 \subsection{NOP}
 
