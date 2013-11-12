@@ -81,7 +81,14 @@ Note that there is no separate ALU control unit.
 \end{table}
 
 \subsubsection*{ALU}
-\todo{alu}
+
+The supplied ALU did not support all desired instructions, and thus it was scrapped in favor of a new one.
+The ALU consists of several separate functional units which all operate on the input signals at any given time.
+The ALU then uses the function code to select which result to output.
+
+A unit worthy of being mentioned is the variable length shifter. This was built from the gound up by a series of static length shifters, each shifting twice as much as the previous.
+This first shifts 1, the second 2, the third 4, the forth 8, and so on.
+The bits of the shift amount is then simply sent to muxes controlling each static shifter.
 
 \subsection{Optimizations}
 \subsubsection*{Forwarding Unit}
@@ -91,7 +98,7 @@ back is high. When \textit{FORWARD\_MEM} or \textit{FORWARD\_WB} is set, the
 MUXes before the ALU, the signal to the ALU is set to the one that was
 forwarded. 
 
-In addition, because the registers are read first, and to get the right adress
+In addition, because the registers are read first, and to get the right address
 on the bus, the forwarding unit sends to the register file as well. However
 there is no forward from instruction memory, due to delayed read.
 
