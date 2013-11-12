@@ -23,6 +23,9 @@ This is a side effect of the data memory only acting on clock ticks.
 Thus, to avoid reading invalid data, the instructions has to be reordered or a nop has to be added. This is normally accomplished by the assembler, which means it is hardly an issue.
 
 \subsection{Instruction Set}
+The instruction set is a reduced MIPS instruction set, supporting some
+arithmetic and logics, both register bound and the immediate form, as well as
+shifting, jumping, branching and load and store.
 
 \subsection{Control Unit}
 
@@ -73,3 +76,8 @@ Thus, to avoid reading invalid data, the instructions has to be reordered or a n
 
 \subsubsection*{Branch Prediction}
 
+\subsection{Assembler}
+An assembler was written in python to easily write more test programs. It
+assumes the programmer knows what she is doing, and will not give nice error
+messages. When given the flag '-x', the assembler writes the instructions on
+hexadecimal form, to easily run the programs on the computer.
