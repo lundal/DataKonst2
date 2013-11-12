@@ -2,7 +2,10 @@
 
 The suggested architecture in figure \ref{fig:suggestedArchitecture} only supports a handful of MIPS instructions, and lacks support for jump instructions that was present in the previous exercise.
 However, by adding a shifter to the ALU and a few additional muxes, mainly to the memory stage, the number of supported instruction can be radically improved from 9 to 29.
+
 The resulting architecture, which includes a forwarding unit for highly improved performance can be seen in figure \ref{fig:cpuArchitecture} below.
+The control signals are not drawn to keep the schematic readable, but they are passed through the pipeline registers as the other signals until they reach their destination stage.
+Note that the jump and branch signals belong to the memory stage.
 
 \begin{figure}[ht]
     \centering
@@ -23,11 +26,18 @@ This is a side effect of the data memory only acting on clock ticks.
 Thus, to avoid reading invalid data, the instructions has to be reordered or a nop has to be added. This is normally accomplished by the assembler, which means it is hardly an issue.
 
 \subsection{Instruction Set}
+
 The instruction set is a reduced MIPS instruction set, supporting some
 arithmetic and logics, both register bound and the immediate form, as well as
-shifting, jumping, branching and load and store.
+shifting, jumping, branching and load and store, totaling 29.
 
-\subsection{Control Unit}
+\subsubsection*{Control Unit}
+
+Since the control signals are propagated to their proper stages through the pipeline, the control unit does not need a state machine like in multi-cycle processors.
+It simply needs to look at the opcode and function to and then output the correct signals for that instruction.
+All instructions and their control signal mappings can be seen below in table \ref{table:ctrlsignals}.
+
+ALU control
 
 \begin{table}[ht]
     \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|}
