@@ -1,8 +1,10 @@
 \subsection{Simulation}
 
-The behaviour of the impementation was tested by writing small programs that would try to provoke certain errors and write debug data to the registers. They were then simulated, and the resulting data in the registers was compared to the desired data.
+The behaviour of the impementation was tested by writing small programs that would try to provoke certain errors and write debug data to the registers.
+They programs were written in a simplified assembly variant and then passed through the assembler to produce signals constants which could be pasted directly into tb\_toplevel.vhd.
+The simulation was then run, and the resulting data in the registers was compared to the desired data corresponding to the assembly.
 
-Alu operations, memory operations, forwarding, jumping, branching and flushing were all tested and proved to work correctly.
+Alu operations, memory operations, forwarding, jumping, branching and flushing were all tested and proved to work correctly. The test programs can be found in the appendix, and there are currently no known bugs.
 
 \subsection{Timing Simulation}
 
@@ -19,7 +21,7 @@ This is very close to the max clock speed of $77.442$ MHz reported by the synthe
 
 \subsection{Verification}
 
-By following the procedure in the compendium \cite[p.47]{lab-compendium} and using the supplied files, the design was added to the MicroBlaze framework and compiled to a bit file.
+By following the extensive procedure in the compendium \cite[p.47]{lab-compendium} and using the supplied user\_logic.vhd and main.c files, the design was added to the MicroBlaze framework and compiled to a bit file, before uploading it to an AvNet Development Board by using AvProg.
 
 
 \begin{figure}[ht]
