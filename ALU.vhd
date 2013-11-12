@@ -83,7 +83,7 @@ begin
         M => M
     )
     port map (
-        I => X,
+        I => Y,
         O => r_shift,
         Left => shift_left,
         Arith => shift_arith,
